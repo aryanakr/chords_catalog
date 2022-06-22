@@ -1,3 +1,4 @@
+import 'package:chords_catalog/models/instrument.dart';
 import 'package:chords_catalog/widgets/instrument_configuration_widget.dart';
 import 'package:flutter/material.dart';
 
@@ -8,7 +9,12 @@ class CreateLogScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final _nameController = TextEditingController();
+
+    void _onLogConfigSubmited(String logName, Tuning tuning, InstrumentSound sound) {
+      print('Got log name: $logName');
+      print('Got tuning with name: ${tuning.name}, pitches: ${tuning.openNotes.map((e) => e.label+',')}');
+      print('Got Sound ${sound.name}');
+    }
 
     return Scaffold(
       appBar: AppBar(title: Text('Create Log'),),
@@ -16,11 +22,7 @@ class CreateLogScreen extends StatelessWidget {
         child: Card(
           child: Column(
             children: [
-              TextField(
-                decoration: InputDecoration(labelText: 'Log Name'),
-                controller: _nameController,
-              ),
-              InstrumentConfigurationWidget()
+              InstrumentConfigurationWidget(submit: _onLogConfigSubmited)
             ],
           ),
         ),

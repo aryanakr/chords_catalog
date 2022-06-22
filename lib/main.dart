@@ -2,6 +2,7 @@ import 'package:chords_catalog/providers/sound_player_provider.dart';
 import 'package:chords_catalog/screens/configuration_screen.dart';
 import 'package:chords_catalog/screens/create_log_screen.dart';
 import 'package:chords_catalog/screens/home_screen.dart';
+import 'package:chords_catalog/screens/scale_configuration_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -25,7 +26,8 @@ class MyApp extends StatelessWidget {
         home: HomeScreen(),
         routes: {
           HomeScreen.routeName: (ctx) => HomeScreen(),
-          CreateLogScreen.routeName: (ctx) => CreateLogScreen()
+          CreateLogScreen.routeName: (ctx) => CreateLogScreen(),
+          ScaleConfigurationScreen.routeName: (ctx) => ScaleConfigurationScreen()
         },
       ),
     );
