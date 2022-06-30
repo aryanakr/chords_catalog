@@ -6,6 +6,8 @@ import 'package:chords_catalog/screens/scale_configuration_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'providers/log_provider.dart';
+
 void main() {
   runApp(const MyApp());
 }
@@ -16,8 +18,8 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider<SongPlayerProvider>(
-      create: (context) => SongPlayerProvider(),
+    return ChangeNotifierProvider<LogProvider>(
+      create: (context) => LogProvider(name: '', sound: null, tuning: null, scale: null),
       child: MaterialApp(
         title: 'Flutter Demo',
         theme: ThemeData(

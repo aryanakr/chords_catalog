@@ -3,10 +3,15 @@ import 'package:flutter/material.dart';
 import '../../models/note.dart';
 
 class ScaleIntervalStripPainter extends CustomPainter {
+  final String root;
+  final List<String> notes;
+
+  ScaleIntervalStripPainter({required this.root, required this.notes});
+
   @override
   void paint(Canvas canvas, Size size) {
     
-    final labels = MidiNote.sharpNoteLabels;
+    final labels = MidiNote.sharpNoteLabelsFromKey(root);
 
     const int endPadding = 10;
     const int intervalPadding = 15;
@@ -23,6 +28,11 @@ class ScaleIntervalStripPainter extends CustomPainter {
     canvas.drawLine(Offset(size.width,size.height-endPadding), Offset(size.width,size.height/3+endPadding), paint);
 
     for (int i =1; i<12 ; i++) {
+
+      if (!notes.contains(labels[i])) {
+        continue;
+      }
+
       final intervalPaint = Paint()
         ..color = Colors.black
         ..strokeWidth = 1;

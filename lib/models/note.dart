@@ -24,6 +24,22 @@ class MidiNote {
     'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'
   ];
 
+  static List<String> sharpNoteLabelsFromKey(String note) {
+    final List<String> res = [];
+
+    final keyIndex = sharpNoteLabels.indexOf(note);
+
+    for (int i = keyIndex; i<sharpNoteLabels.length ; i++) {
+      res.add(sharpNoteLabels[i]);
+    }
+
+    for (int i = keyIndex-1 ; i >= 0 ; i--) {
+      res.add(sharpNoteLabels[i]);
+    }
+
+    return res;
+  }
+
   static List<String> allNoteLabels() {
     List<String> res = [];
     for (int i = -2 ; i <=8 ; i++ ) {
