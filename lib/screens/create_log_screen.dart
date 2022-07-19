@@ -17,7 +17,7 @@ class CreateLogScreen extends StatelessWidget {
       // print('Got log name: $logName');
       // print('Got tuning with name: ${tuning.name}, pitches: ${tuning.openNotes.map((e) => e.label)}');
       // print('Got Sound ${sound.name}');
-      Provider.of<LogProvider>(context).setLog(logName, tuning, sound);
+      Provider.of<LogProvider>(context, listen: false).setLog(logName, tuning, sound);
       Navigator.of(context).pushNamed(ScaleConfigurationScreen.routeName);
     }
 

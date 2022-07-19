@@ -37,8 +37,9 @@ class _ScaleConfigurationScreenState extends State<ScaleConfigurationScreen> {
   }
 
   void _submitScale() {
-    final scaleMidiNotes = notes.map((e) => MidiNote.byLabel(label: e)).toList();
-    Provider.of<LogProvider>(context).setLogScale(LogScale(root: MidiNote.byLabel(label: scaleKey), notes: scaleMidiNotes));
+    print(notes);
+
+    Provider.of<LogProvider>(context, listen: false).setLogScale(LogScale(root: scaleKey, notes: notes));
 
     Navigator.of(context).pushNamed(DashboardScreen.routeName);
   }
