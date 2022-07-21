@@ -37,6 +37,7 @@ dependencies:
   provider: ^6.0.2
   flutter_midi: ^1.1.0
   numberpicker: ^2.1.1
+  csv: ^5.0.1
 
 dev_dependencies:
   flutter_test:
@@ -68,6 +69,7 @@ flutter:
    - assets/Perfect_Sine.sf2
    - assets/Piano.sf2
    - assets/Electric-Guitars.sf2
+   - assets/chords.csv
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

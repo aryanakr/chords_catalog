@@ -1,4 +1,5 @@
 import 'package:chords_catalog/providers/sound_player_provider.dart';
+import 'package:chords_catalog/screens/chord_view_screen.dart';
 import 'package:chords_catalog/screens/configuration_screen.dart';
 import 'package:chords_catalog/screens/create_chord_screen.dart';
 import 'package:chords_catalog/screens/create_log_screen.dart';
@@ -33,7 +34,8 @@ class MyApp extends StatelessWidget {
           CreateLogScreen.routeName: (ctx) => CreateLogScreen(),
           ScaleConfigurationScreen.routeName: (ctx) => ScaleConfigurationScreen(),
           DashboardScreen.routeName: (ctx) => DashboardScreen(),
-          CreateChordScreen.routeName: (ctx) => CreateChordScreen()
+          CreateChordScreen.routeName: (ctx) => CreateChordScreen(),
+          ChordViewScreen.routeName: (ctx) => ChordViewScreen()
         },
       ),
     );
