@@ -21,6 +21,8 @@ class _CreateChordScreenState extends State<CreateChordScreen> {
   late int numStrings;
   int startFret = 0;
 
+  String selectedRootLabel = 'C';
+
   void _submit(BuildContext context) {
     Navigator.of(context).pushNamed(ChordViewScreen.routeName);
   }
@@ -75,13 +77,23 @@ class _CreateChordScreenState extends State<CreateChordScreen> {
               builder: ((context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.done && snapshot.data != null) {
                   final data = snapshot.data as List<List<dynamic>>;
+
+                  final List<List<dynamic>> dataFiltered = [];
+
+                  for (List<dynamic> row in data) {
+                    if (row[0].toString() == selectedRootLabel) {
+                      dataFiltered.add(row);
+                    }
+                  }
+
                   
-                  return Text(data[0].toString());
+                  return Text(dataFiltered[1].toString());
                 }
                   return Text("Hello");
                 
                 
-              })),
+              })
+              ),
           Expanded(child: Container()),
           FretboardWidget(
             addNote: addNote,
