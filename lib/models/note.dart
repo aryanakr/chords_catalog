@@ -4,6 +4,10 @@ class MidiNote {
   late String label;
   late int midiNumber;
 
+  String getNoteLabel() {
+    return label.replaceAll(RegExp('[-0-9]'),'');
+  }
+
   MidiNote.byMidiNumber({required this.midiNumber}) {
 
     String noteLabel = sharpNoteLabels[midiNumber % 12];

@@ -22,6 +22,23 @@ class _CreateChordScreenState extends State<CreateChordScreen> {
   int startFret = 0;
 
   String selectedRootLabel = 'C';
+  Chord? selectedChordType = null;
+  int selectedChordIndex = -1;
+
+  void _setRootNote(String newLabel) {
+    setState(() {
+      selectedRootLabel = newLabel;
+    });
+  }
+
+  void _setChordType(Chord? newChord, int index) {
+
+    setState(() {
+      selectedChordType = newChord;
+      selectedChordIndex = index;
+    });
+
+  }
 
   void _submit(BuildContext context) {
     Navigator.of(context).pushNamed(ChordViewScreen.routeName);
@@ -38,13 +55,14 @@ class _CreateChordScreenState extends State<CreateChordScreen> {
 
   @override
   void initState() {
-    // TODO: implement initState
     numStrings = Provider.of<LogProvider>(context, listen: false)
         .tuning!
         .openNotes
         .length;
     chordNotes = [for (int i = 0; i < numStrings; i++) null];
     chordCardNotes = [for (int i = 0; i < numStrings; i++) null];
+
+    selectedRootLabel = Provider.of<LogProvider>(context, listen: false).scale!.root;
   }
 
   @override
@@ -72,31 +90,75 @@ class _CreateChordScreenState extends State<CreateChordScreen> {
           SizedBox(
             height: 10,
           ),
+          Row(
+            children: [
+              Text('Key:'),
+              DropdownButton(
+                  items: [
+                    for (String noteLabel in Provider.of<LogProvider>(context, listen: false).scale!.notes)
+                      DropdownMenuItem(
+                        child: Text(noteLabel),
+                        value: noteLabel,
+                      ),
+                  ],
+                  value: selectedRootLabel,
+                  onChanged: (String? s) {
+                    if (s != null) _setRootNote(s);
+                  }),
+            ],
+          ),
           FutureBuilder(
               future: Chord.loadLib(),
               builder: ((context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.done && snapshot.data != null) {
+                if (snapshot.connectionState == ConnectionState.done &&
+                    snapshot.data != null) {
                   final data = snapshot.data as List<List<dynamic>>;
 
                   final List<List<dynamic>> dataFiltered = [];
 
+                  final scale = Provider.of<LogProvider>(context, listen: false).scale!.notes;
+
                   for (List<dynamic> row in data) {
-                    if (row[0].toString() == selectedRootLabel) {
+                    final rowNotes = row[3].toString().split(',');
+                    if (row[0].toString() == selectedRootLabel && !rowNotes.any((element) => !scale.contains(element))) {
                       dataFiltered.add(row);
                     }
                   }
 
-                  
-                  return Text(dataFiltered[1].toString());
+                  return Row(
+                    children: [
+                      Text('Key:'),
+                      DropdownButton(
+                          items: [
+                            DropdownMenuItem(
+                              child: Text('Custom'),
+                              value: -1,
+                            ),
+                            for (int i = 0; i < dataFiltered.length; i++)
+                              DropdownMenuItem(
+                                child: Text(dataFiltered[i][1].toString()),
+                                value: i,
+                              ),
+                          ],
+                          value: selectedChordIndex,
+                          onChanged: (int? index) {
+                            if (index != null  && index >= 0){
+                              Chord newChord = Chord(root: dataFiltered[index][0].toString(), type: dataFiltered[index][1].toString(), structure:  dataFiltered[index][2].toString(), noteLabels: dataFiltered[index][3].toString().split(','));
+                              _setChordType(newChord, index);
+                            }
+                            else {
+                              _setChordType(null, -1);
+                            }
+                          }),
+                    ],
+                  );
                 }
-                  return Text("Hello");
-                
-                
-              })
-              ),
+                return Container();
+              })),
           Expanded(child: Container()),
           FretboardWidget(
             addNote: addNote,
+            enabledNotes: selectedChordType == null ? Provider.of<LogProvider>(context, listen: false).scale!.notes : selectedChordType!.noteLabels
           )
         ],
       ),

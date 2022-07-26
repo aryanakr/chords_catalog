@@ -16,7 +16,6 @@ class Chord {
     
     final rawData = await rootBundle.loadString("assets/chords.csv");
     final List<List<dynamic>> data = CsvToListConverter().convert(rawData);
-    print(data[0].toString());
 
     return data;
   }
