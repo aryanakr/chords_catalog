@@ -3,6 +3,7 @@ import 'package:chords_catalog/models/chord.dart';
 import 'package:chords_catalog/models/note.dart';
 import 'package:chords_catalog/providers/log_provider.dart';
 import 'package:chords_catalog/screens/chord_view_screen.dart';
+import 'package:chords_catalog/widgets/chord_card_widget.dart';
 import 'package:chords_catalog/widgets/fretboard_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -53,6 +54,14 @@ class _CreateChordScreenState extends State<CreateChordScreen> {
     return true;
   }
 
+  String _getChordName() {
+    if (selectedChordType == null) {
+      return "Select Chord Type";
+    }
+
+    return selectedChordType!.root + selectedChordType!.type;
+  }
+
   @override
   void initState() {
     numStrings = Provider.of<LogProvider>(context, listen: false)
@@ -79,14 +88,7 @@ class _CreateChordScreenState extends State<CreateChordScreen> {
           SizedBox(
             height: 10,
           ),
-          Center(
-              child: CustomPaint(
-            size: Size(200, 200),
-            painter: ChordCardPainter(
-                numStrings: numStrings,
-                startFret: startFret,
-                notes: chordCardNotes),
-          )),
+          ChordCardWidget(name: _getChordName(), numStrings: numStrings, startFret: startFret, notes: chordCardNotes),
           SizedBox(
             height: 10,
           ),
@@ -127,7 +129,7 @@ class _CreateChordScreenState extends State<CreateChordScreen> {
 
                   return Row(
                     children: [
-                      Text('Key:'),
+                      Text('Type:'),
                       DropdownButton(
                           items: [
                             DropdownMenuItem(
