@@ -17,6 +17,6 @@ class _FretboardNoteButtonState extends State<FretboardNoteButton> {
         height: 25,
         color: Colors.pink,
         child: ElevatedButton(
-            onPressed: widget.triggerNote == null ? null : () => widget.triggerNote!(), child: Text(widget.note.label)));
+            onPressed: widget.triggerNote == null ? null : () => widget.triggerNote!(), child: Text(widget.note.getNoteLabel())));
   }
 }

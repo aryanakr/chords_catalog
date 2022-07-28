@@ -34,10 +34,20 @@ class ChordCardPainter extends CustomPainter {
     final frameBottomRightOffset = Offset(size.width - framePaddingHorizental, size.height - framePaddingVertical);
 
     // draw border
-    canvas.drawLine(frameTopLeftOffset, frameTopRightOffset, startFret == 0 ? thickPaint : paint); // top
+    canvas.drawLine(frameTopLeftOffset, frameTopRightOffset, startFret <= 1 ? thickPaint : paint); // top
     canvas.drawLine(frameTopRightOffset, frameBottomRightOffset, paint); // left
     canvas.drawLine(frameBottomLeftOffset, frameBottomRightOffset, paint); // bottom
     canvas.drawLine(frameBottomLeftOffset,frameTopLeftOffset, paint); // right
+
+    // draw fret text
+    if (startFret > 1) {
+      final fretTextStyle = TextStyle(color: Colors.black, fontSize: 18);
+      final textSpan = TextSpan(text: 'fret $startFret', style: fretTextStyle);
+      final textPainter = TextPainter(text: textSpan, textDirection: TextDirection.ltr);
+      textPainter.layout(minWidth: 0, maxWidth: size.width);
+      final fretTextOffset = Offset(frameTopRightOffset.dx + 8, frameTopRightOffset.dy +2);
+      textPainter.paint(canvas, fretTextOffset);
+    }
 
     // draw strings
     double stringsPadding = (size.width - 2 * framePaddingHorizental) / (numStrings - 1);

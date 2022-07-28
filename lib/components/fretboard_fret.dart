@@ -7,7 +7,7 @@ import 'package:provider/provider.dart';
 class FretboardFret extends StatelessWidget {
   
   final List<MidiNote> notes;
-  final Function(int, MidiNote) triggerNote;
+  final Function(int, MidiNote)? triggerNote;
   final List<String> enabledNotes;
 
   FretboardFret({required this.notes, required this.triggerNote, required this.enabledNotes});
@@ -19,8 +19,8 @@ class FretboardFret extends StatelessWidget {
       child: Column(
         children: [
           for ( var i = 0; i<notes.length ;i++) 
-            FretboardNoteButton(note: notes[i],triggerNote: enabledNotes.contains(notes[i].getNoteLabel()) ? () {
-              triggerNote(notes.length - i-1, notes[i]);
+            FretboardNoteButton(note: notes[i],triggerNote: (enabledNotes.contains(notes[i].getNoteLabel()) && triggerNote != null) ? () {
+              triggerNote!(notes.length - i-1, notes[i]);
             } : null),
         ],
       ),

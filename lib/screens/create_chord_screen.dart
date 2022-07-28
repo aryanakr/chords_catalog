@@ -1,3 +1,4 @@
+import 'package:chords_catalog/components/number_picker.dart';
 import 'package:chords_catalog/components/painters/chord_card_painter.dart';
 import 'package:chords_catalog/models/chord.dart';
 import 'package:chords_catalog/models/note.dart';
@@ -20,7 +21,7 @@ class _CreateChordScreenState extends State<CreateChordScreen> {
   late List<MidiNote?> chordNotes;
   late List<int?> chordCardNotes;
   late int numStrings;
-  int startFret = 0;
+  int startFret = 1;
 
   String selectedRootLabel = 'C';
   Chord? selectedChordType = null;
@@ -29,6 +30,10 @@ class _CreateChordScreenState extends State<CreateChordScreen> {
   void _setRootNote(String newLabel) {
     setState(() {
       selectedRootLabel = newLabel;
+      selectedChordType = null;
+      selectedChordIndex = -1;
+
+      clearCard();
     });
   }
 
@@ -37,8 +42,25 @@ class _CreateChordScreenState extends State<CreateChordScreen> {
     setState(() {
       selectedChordType = newChord;
       selectedChordIndex = index;
+
+      clearCard();
     });
 
+  }
+
+  void _setStartFret(int fret) {
+    setState(() {
+      startFret = fret;
+
+      // remove out of card notes and set the start fret
+        final fretDiff = fret - startFret;
+        for (int i = 0; i < chordCardNotes.length; i++) {
+            final t = chordCardNotes[i];
+            if (t != null && t != 0 && (t < fret || t-fret > 5)) {
+              chordCardNotes[i] = null;
+            }
+          }
+    });
   }
 
   void _submit(BuildContext context) {
@@ -47,8 +69,13 @@ class _CreateChordScreenState extends State<CreateChordScreen> {
 
   bool addNote(MidiNote note, int string, int fret) {
     setState(() {
-      chordNotes[string] = note;
-      chordCardNotes[string] = fret;
+      if (chordNotes[string] != null && chordNotes[string]!.midiNumber == note.midiNumber && chordCardNotes[string] == fret ) {
+        chordNotes[string] = null;
+        chordCardNotes[string] = null;
+      } else {
+        chordNotes[string] = note;
+        chordCardNotes[string] = fret;
+      }
     });
 
     return true;
@@ -60,6 +87,13 @@ class _CreateChordScreenState extends State<CreateChordScreen> {
     }
 
     return selectedChordType!.root + selectedChordType!.type;
+  }
+
+  void clearCard() {
+    chordNotes = [for (int i = 0; i < numStrings; i++) null];
+    chordCardNotes = [for (int i = 0; i < numStrings; i++) null];
+
+    startFret = 1;
   }
 
   @override
@@ -133,7 +167,7 @@ class _CreateChordScreenState extends State<CreateChordScreen> {
                       DropdownButton(
                           items: [
                             DropdownMenuItem(
-                              child: Text('Custom'),
+                              child: Text('Select'),
                               value: -1,
                             ),
                             for (int i = 0; i < dataFiltered.length; i++)
@@ -157,9 +191,17 @@ class _CreateChordScreenState extends State<CreateChordScreen> {
                 }
                 return Container();
               })),
+          
+          Row(
+            children: [
+              Text('Starting fret'),
+              NumberPicker(min: 1, max: 19, value: startFret, update: _setStartFret),
+            ],
+          ),
           Expanded(child: Container()),
           FretboardWidget(
             addNote: addNote,
+            startFret: startFret,
             enabledNotes: selectedChordType == null ? Provider.of<LogProvider>(context, listen: false).scale!.notes : selectedChordType!.noteLabels
           )
         ],

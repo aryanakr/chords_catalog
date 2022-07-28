@@ -8,9 +8,10 @@ import '../models/note.dart';
 class FretboardWidget extends StatelessWidget {
 
   final List<String> enabledNotes;
+  final int startFret;
   final Function(MidiNote, int, int) addNote;
 
-  FretboardWidget({required this.enabledNotes, required this.addNote});
+  FretboardWidget({required this.enabledNotes, required this.startFret, required this.addNote});
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +26,7 @@ class FretboardWidget extends StatelessWidget {
                 color: Colors.red,
                 child: FretboardFret(
                   notes: notes,
-                  triggerNote: (int stringIndex, MidiNote note) {
+                  triggerNote: (index != 0 && (index < startFret || index - startFret >= 5)) ? null : (int stringIndex, MidiNote note) {
                     addNote(note, stringIndex, index);
                   },
                   enabledNotes: enabledNotes,
@@ -34,7 +35,7 @@ class FretboardWidget extends StatelessWidget {
           separatorBuilder: (BuildContext context, int index) {
             return const Divider();
           },
-          itemCount: 22),
+          itemCount: 24),
     );
   }
 }
