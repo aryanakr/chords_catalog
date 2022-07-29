@@ -62,7 +62,7 @@ class _InstrumentConfigurationWidgetState extends State<InstrumentConfigurationW
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Please fill all pitches!')));
     } else {
       final midiNotes = tuning.map((e) => MidiNote.byLabel(label: e)).toList();
-      final finalTuning = Tuning(name: tuningName, openNotes: midiNotes);
+      final finalTuning = Tuning(name: tuningName, openNotes: midiNotes, numStrings: stringsNumber);
       widget.submit(_nameController.text, finalTuning, instrumentSound);
     }
   }

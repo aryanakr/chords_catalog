@@ -4,6 +4,7 @@ import 'package:chords_catalog/models/chord.dart';
 import 'package:chords_catalog/models/note.dart';
 import 'package:chords_catalog/providers/log_provider.dart';
 import 'package:chords_catalog/screens/chord_view_screen.dart';
+import 'package:chords_catalog/screens/dashboard_screen.dart';
 import 'package:chords_catalog/widgets/chord_card_widget.dart';
 import 'package:chords_catalog/widgets/fretboard_widget.dart';
 import 'package:flutter/material.dart';
@@ -64,7 +65,23 @@ class _CreateChordScreenState extends State<CreateChordScreen> {
   }
 
   void _submit(BuildContext context) {
-    Navigator.of(context).pushNamed(ChordViewScreen.routeName);
+
+    if (selectedChordType == null) {
+      return;
+    }
+
+    final List<MidiNote> midiNotes = [];
+
+    for (MidiNote? m in chordNotes) {
+      if (m != null) {
+        midiNotes.add(m);
+      }
+    }
+
+    final guitarChord = GuitarChord(chord: selectedChordType!, name: _getChordName(), cardDotsPos: chordCardNotes, startFret: startFret, midiNotes: midiNotes);
+    Provider.of<LogProvider>(context, listen: false).addChord(guitarChord);
+
+    Navigator.of(context).pushReplacementNamed(DashboardScreen.routeName);
   }
 
   bool addNote(MidiNote note, int string, int fret) {

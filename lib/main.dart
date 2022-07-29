@@ -22,7 +22,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<LogProvider>(
-      create: (context) => LogProvider(name: '', sound: null, tuning: null, scale: null),
+      create: (context) => LogProvider(name: '', sound: null, tuning: null, scale: null, chords: []),
       child: MaterialApp(
         title: 'Flutter Demo',
         theme: ThemeData(
