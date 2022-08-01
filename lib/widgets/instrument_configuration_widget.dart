@@ -37,6 +37,8 @@ class _InstrumentConfigurationWidgetState extends State<InstrumentConfigurationW
         for (int i =0 ; i<stringsNumber;  i++)
           i < prevTuning.length ? prevTuning[i] : ''
       ];
+
+      tuningName = Tuning.customTuningName;
     
     });
   }
@@ -70,19 +72,22 @@ class _InstrumentConfigurationWidgetState extends State<InstrumentConfigurationW
   @override
   Widget build(BuildContext context) {
     return Container(
+      margin: const EdgeInsets.all(20),
       child: Column(
         children: [
           TextField(
-                decoration: InputDecoration(labelText: 'Log Name'),
+                decoration: const InputDecoration(labelText: 'Log Name'),
                 controller: _nameController,
               ),
+          const SizedBox(height: 8,),
           Row(children: [
-            Text('Number of Strings'),
-            NumberPicker(value: this.stringsNumber, update: _setStringNumber, min: 1)
+            const Text('Number of Strings'),
+            NumberPicker(value: stringsNumber, update: _setStringNumber, min: 1)
           ],),
           TuningPicker(numStrings: stringsNumber, update: _setTuning, currentTuningPitches: tuning, tuningName: tuningName),
           Row(children: [
-            Text('Sound'),
+            const Text('Sound'),
+            const SizedBox(width: 24,),
             DropdownButton(items: [
               for (InstrumentSound sound in InstrumentSound.DefaultSounds)
                   DropdownMenuItem(
@@ -92,13 +97,15 @@ class _InstrumentConfigurationWidgetState extends State<InstrumentConfigurationW
                 ], 
                 value: instrumentSound,
                 onChanged: (InstrumentSound? selectedSound) {
-                  if (selectedSound != null)
+                  if (selectedSound != null) {
                     _setSound(selectedSound);
+                  }
                 })
           ],),
+          Expanded(child: Container(),),
           ElevatedButton(onPressed: () {
             _submitForm();
-          }, child: Text('Next'))
+          }, child: const Text('Next'))
         ],
       ),
     );

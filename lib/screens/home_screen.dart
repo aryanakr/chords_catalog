@@ -4,17 +4,32 @@ import 'package:flutter/material.dart';
 class HomeScreen extends StatelessWidget {
   static const routeName = '/home';
 
-  const HomeScreen({ Key? key }) : super(key: key);
+  const HomeScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+
+    final screenSize = MediaQuery.of(context).size;
     return Scaffold(
-      appBar: AppBar(title: Text('My chords Log'),),
+      appBar: AppBar(
+        title: Text('My chords Log'),
+      ),
       body: Center(
-        child: Card(
-          child: ElevatedButton(child: Text('New Log'), onPressed: () {
-            Navigator.of(context).pushNamed(CreateLogScreen.routeName);
-          }),
+        child: Container(
+          width: screenSize.width / 4 * 3,
+          height: screenSize.height / 3 * 1,
+          child: Card(
+            child: Column(
+              children: [
+                ElevatedButton(
+                  child: Text('New Log'),
+                  onPressed: () {
+                    Navigator.of(context).pushNamed(CreateLogScreen.routeName);
+                  },
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );

@@ -7,36 +7,32 @@ class TuningPicker extends StatefulWidget {
   final String tuningName;
   List<String> currentTuningPitches;
   final void Function(String, List<String>) update;
-  
 
-  TuningPicker({
-    required this.numStrings,
-    required this.tuningName,
-    required this.currentTuningPitches,
-    required this.update
-      });
+  TuningPicker(
+      {Key? key,
+      required this.numStrings,
+      required this.tuningName,
+      required this.currentTuningPitches,
+      required this.update})
+      : super(key: key);
 
   @override
   State<TuningPicker> createState() => _TuningPickerState();
 }
 
 class _TuningPickerState extends State<TuningPicker> {
-  void _setTuning(List<String> tune) {
+  void _setTuning(String name, List<String> tune) {
     setState(() {
       widget.currentTuningPitches = tune;
-      widget.update(widget.tuningName, tune);
+      widget.update(name, tune);
     });
   }
 
   void _setTuningPitch(int index, String? pitchLabel) {
     setState(() {
       widget.currentTuningPitches[index] = pitchLabel ?? '';
-      widget.update(widget.tuningName, widget.currentTuningPitches);
+      widget.update(Tuning.customTuningName, widget.currentTuningPitches);
     });
-  }
-
-  void _setTuningFromDefaults() {
-    
   }
 
   @override
@@ -44,67 +40,76 @@ class _TuningPickerState extends State<TuningPicker> {
     List<Tuning> tuningsList =
         Tuning.retrieveKnownTuningForStrings(widget.numStrings);
 
-    return Container(
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Text('Tuning'),
-              DropdownButton(
-                  items: [
-                    for (Tuning t in tuningsList)
-                      DropdownMenuItem(
-                        child: Text(t.name),
-                        value: t,
-                      ),
-                  ],
-                  value: tuningsList[0],
-                  onChanged: (Tuning? selTuning) {
-                    if (selTuning != null && !selTuning.isCustomTuning) {
+    return Column(
+      children: [
+        Row(
+          children: [
+            const Text('Tuning'),
+            const SizedBox(
+              width: 24,
+            ),
+            DropdownButton(
+                items: [
+                  for (Tuning t in tuningsList)
+                    DropdownMenuItem(
+                      child: Text(t.name),
+                      value: t.name,
+                    ),
+                ],
+                value: widget.tuningName,
+                onChanged: (String? selTuning) {
+                  if (selTuning != null) {
+                    final tuning = tuningsList
+                        .firstWhere((element) => element.name == selTuning);
+                    if (!tuning.isCustomTuning) {
                       final labels =
-                          selTuning.openNotes.map((e) => e.label).toList();
-                      _setTuning(labels);
+                          tuning.openNotes.map((e) => e.label).toList();
+                      _setTuning(tuning.name, labels);
                     }
-                  })
+                  }
+                })
+          ],
+        ),
+        const SizedBox(
+          height: 18,
+        ),
+        const Text('Pitches'),
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.all(12),
+          child: Row(
+            children: [
+              for (int pitchIndex = 0;
+                  pitchIndex < widget.numStrings;
+                  pitchIndex++)
+                Row(
+                  children: [
+                    DropdownButton(
+                        items: [
+                          const DropdownMenuItem(
+                            child: Text(''),
+                            value: '',
+                          ),
+                          for (String label
+                              in MidiNote.allNoteLabels().skip(24))
+                            DropdownMenuItem(
+                              child: Text(label),
+                              value: label,
+                            ),
+                        ],
+                        value: widget.currentTuningPitches[pitchIndex],
+                        onChanged: (String? selPitchLabel) {
+                          _setTuningPitch(pitchIndex, selPitchLabel);
+                        }),
+                    const SizedBox(
+                      width: 12,
+                    )
+                  ],
+                )
             ],
           ),
-          Text('Pitches'),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.all(12),
-            child: Row(
-              children: [
-                for (int pitchIndex = 0;
-                    pitchIndex < widget.numStrings;
-                    pitchIndex++)
-                  Row(
-                    children: [
-                      DropdownButton(
-                          items: [
-                            const DropdownMenuItem(
-                              child: Text(''),
-                              value: '',
-                            ),
-                            for (String label in MidiNote.allNoteLabels())
-                              DropdownMenuItem(
-                                child: Text(label),
-                                value: label,
-                              ),
-                          ],
-                          value: widget.currentTuningPitches[pitchIndex],
-                          onChanged: (String? selPitchLabel) {
-                            _setTuningPitch(pitchIndex, selPitchLabel);
-                          }),
-                      SizedBox(
-                        width: 12,
-                      )
-                    ],
-                  )
-              ],
-            ),
-          )
-        ],
-      ),
+        )
+      ],
     );
   }
 }

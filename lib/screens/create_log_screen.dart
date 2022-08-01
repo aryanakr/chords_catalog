@@ -22,13 +22,19 @@ class CreateLogScreen extends StatelessWidget {
     }
 
     return Scaffold(
-      appBar: AppBar(title: Text('Create Log'),),
-      body: Center(
-        child: Card(
-          child: Column(
-            children: [
-              InstrumentConfigurationWidget(submit: _onLogConfigSubmited)
-            ],
+      appBar: AppBar(title: const Text('Create Log'),),
+      body: SingleChildScrollView(
+        scrollDirection: Axis.vertical,
+        child: Container(
+          height: 600,
+          width: MediaQuery.of(context).size.width,
+          child: Center(
+            child: Container(
+              margin: const EdgeInsets.all(16),
+              child: Card(
+                child: InstrumentConfigurationWidget(submit: _onLogConfigSubmited),
+              ),
+            ),
           ),
         ),
       ),

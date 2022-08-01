@@ -36,19 +36,22 @@ class Tuning {
       MidiNote.byLabel(label: 'B3'),
       MidiNote.byLabel(label: 'E4'),
     ];
+    isCustomTuning = false;
     name = 'Standard';
     numStrings = 6;
 
   }
 
   static List<Tuning> retrieveKnownTuningForStrings(int numStrings) {
-    Tuning custom = Tuning(name: 'Custom', openNotes: [], numStrings: numStrings, isCustomTuning: true);
+    Tuning custom = Tuning(name: customTuningName, openNotes: [], numStrings: numStrings, isCustomTuning: true);
     if (numStrings == 6) {
-      return [Tuning.standardTuning(), custom];
+      return [custom, Tuning.standardTuning()];
     }
 
     return [custom];
   }
+
+  static String customTuningName =  'Custom';
 
 }
 
