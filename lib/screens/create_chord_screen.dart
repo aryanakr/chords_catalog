@@ -57,7 +57,7 @@ class _CreateChordScreenState extends State<CreateChordScreen> {
         final fretDiff = fret - startFret;
         for (int i = 0; i < chordCardNotes.length; i++) {
             final t = chordCardNotes[i];
-            if (t != null && t != 0 && (t < fret || t-fret > 5)) {
+            if (t != null && t != 0 && (t < fret || t-fret > 4)) {
               chordCardNotes[i] = null;
             }
           }
@@ -139,7 +139,7 @@ class _CreateChordScreenState extends State<CreateChordScreen> {
           SizedBox(
             height: 10,
           ),
-          ChordCardWidget(name: _getChordName(), numStrings: numStrings, startFret: startFret, notes: chordCardNotes),
+          ChordCardWidget(name: _getChordName(), numStrings: numStrings, startFret: startFret, notes: GuitarChord.toDrawCardDotsPos(chordCardNotes, startFret)),
           SizedBox(
             height: 10,
           ),

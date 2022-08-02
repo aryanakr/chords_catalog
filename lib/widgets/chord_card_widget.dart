@@ -7,8 +7,8 @@ class ChordCardWidget extends StatelessWidget {
   final int startFret;
   final List<int?> notes;
 
-  ChordCardWidget(
-      {required this.name, required this.numStrings, required this.startFret, required this.notes});
+  const ChordCardWidget(
+      {Key? key, required this.name, required this.numStrings, required this.startFret, required this.notes}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -19,12 +19,12 @@ class ChordCardWidget extends StatelessWidget {
           name,
           style: TextStyle(fontSize: 24),
         )),
-        SizedBox(
+        const SizedBox(
           height: 12,
         ),
         Center(
             child: CustomPaint(
-          size: Size(200, 200),
+          size: const Size(200, 200),
           painter: ChordCardPainter(
               numStrings: numStrings, startFret: startFret, notes: notes),
         ))

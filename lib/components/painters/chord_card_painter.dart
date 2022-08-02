@@ -42,7 +42,7 @@ class ChordCardPainter extends CustomPainter {
     // draw fret text
     if (startFret > 1) {
       final fretTextStyle = TextStyle(color: Colors.black, fontSize: 18);
-      final textSpan = TextSpan(text: 'fret $startFret', style: fretTextStyle);
+      final textSpan = TextSpan(text: 'f$startFret', style: fretTextStyle);
       final textPainter = TextPainter(text: textSpan, textDirection: TextDirection.ltr);
       textPainter.layout(minWidth: 0, maxWidth: size.width);
       final fretTextOffset = Offset(frameTopRightOffset.dx + 8, frameTopRightOffset.dy +2);

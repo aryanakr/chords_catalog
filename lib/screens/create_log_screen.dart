@@ -25,7 +25,7 @@ class CreateLogScreen extends StatelessWidget {
       appBar: AppBar(title: const Text('Create Log'),),
       body: SingleChildScrollView(
         scrollDirection: Axis.vertical,
-        child: Container(
+        child: SizedBox(
           height: 600,
           width: MediaQuery.of(context).size.width,
           child: Center(
