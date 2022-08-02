@@ -10,25 +10,34 @@ class ScaleIntervalStripPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    
     final labels = MidiNote.sharpNoteLabelsFromKey(root);
 
-    const int endPadding = 10;
     const int intervalPadding = 15;
-    const int intervalLabelPadding = 5;
+    const int intervalLabelPadding = 4;
 
-    final paint = Paint()
-        ..color = Colors.black
-        ..strokeWidth = 2;
-    canvas.drawLine(Offset(0, size.height/3*2), Offset(size.width, size.height/3*2), paint);
+    final paintB1 = Paint()
+      ..color = Colors.black
+      ..strokeWidth = 3;
 
+    final paintB2 = Paint()
+      ..color = Colors.black
+      ..strokeWidth = 2;
+    canvas.drawLine(Offset(0, size.height / 3 * 2),
+        Offset(size.width, size.height / 3 * 2), paintB2);
 
     // start and end lines
-    canvas.drawLine(Offset(0,size.height-endPadding), Offset(0,size.height/3+endPadding), paint);
-    canvas.drawLine(Offset(size.width,size.height-endPadding), Offset(size.width,size.height/3+endPadding), paint);
+    canvas.drawLine(Offset(0, size.height - intervalPadding + 2),
+        Offset(0, size.height / 3 + intervalPadding - 2), paintB1);
+    canvas.drawLine(Offset(size.width, size.height - intervalPadding + 2),
+        Offset(size.width, size.height / 3 + intervalPadding - 2), paintB1);
 
-    for (int i =1; i<12 ; i++) {
+    // draw root note label
+    drawLabel(canvas, root, Offset(0, size.height / 3 + intervalLabelPadding));
+    drawLabel(canvas, root,
+        Offset(size.width, size.height / 3 + intervalLabelPadding));
 
+    // draw other notes label
+    for (int i = 1; i < 12; i++) {
       if (!notes.contains(labels[i])) {
         continue;
       }
@@ -37,16 +46,15 @@ class ScaleIntervalStripPainter extends CustomPainter {
         ..color = Colors.black
         ..strokeWidth = 1;
 
-      final dx = i*(size.width/12);
-      final p1 = Offset(dx, size.height/3+intervalPadding);
-      final p2 = Offset(dx, size.height-intervalPadding);
+      final dx = i * (size.width / 12);
+      final p1 = Offset(dx, size.height / 3 + intervalPadding);
+      final p2 = Offset(dx, size.height - intervalPadding);
 
-      final labelP = Offset(dx, size.height/3+intervalLabelPadding);
+      final labelP = Offset(dx, size.height / 3 + intervalLabelPadding);
 
       canvas.drawLine(p1, p2, intervalPaint);
 
       drawLabel(canvas, labels[i], labelP);
-
     }
   }
 
@@ -67,9 +75,9 @@ class ScaleIntervalStripPainter extends CustomPainter {
       minWidth: 0,
       maxWidth: 100.0,
     );
-    
-    final offset = Offset(centre.dx - textPainter.width / 2,
-        centre.dy - textPainter.height / 2);
+
+    final offset = Offset(
+        centre.dx - textPainter.width / 2, centre.dy - textPainter.height / 2);
     textPainter.paint(canvas, offset);
   }
 
@@ -77,5 +85,4 @@ class ScaleIntervalStripPainter extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) {
     return true;
   }
-
 }

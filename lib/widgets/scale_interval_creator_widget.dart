@@ -15,13 +15,17 @@ class ScaleIntervalCreatorWidget extends StatefulWidget {
 
 class _ScaleIntervalCreatorWidgetState extends State<ScaleIntervalCreatorWidget> {
 
+  
   @override
   Widget build(BuildContext context) {
+
     final selectedNotes = widget.notes;
+    final rootIndex = MidiNote.sharpNoteLabels.indexOf(widget.rootNote);
 
     void _addNoteToScale (String noteLabel) {
       widget.addNoteCallback(noteLabel);
     }
+
 
     return Container(
       child: Column(
@@ -30,6 +34,8 @@ class _ScaleIntervalCreatorWidgetState extends State<ScaleIntervalCreatorWidget>
             size: Size(MediaQuery.of(context).size.width-50, 70),
             painter: ScaleIntervalStripPainter(root: widget.rootNote, notes: widget.notes),
           ),
+          SizedBox(height: 8,)
+          ,
           SizedBox(
             height: 130,
             width: MediaQuery.of(context).size.width,
@@ -39,9 +45,12 @@ class _ScaleIntervalCreatorWidgetState extends State<ScaleIntervalCreatorWidget>
               mainAxisSpacing: 5,
               crossAxisCount: 6,
               children: [
-                for(int i = 0; i<MidiNote.sharpNoteLabels.length ; i++)
-                  ElevatedButton(onPressed: selectedNotes.contains(MidiNote.sharpNoteLabels[i]) ? null : () {_addNoteToScale(MidiNote.sharpNoteLabels[i]);},
-                   child: Text(MidiNote.sharpNoteLabels[i]))
+                for(int i = rootIndex; i<MidiNote.sharpNoteLabels.length ; i++)
+                  ElevatedButton(onPressed: i == rootIndex ? null: () {_addNoteToScale(MidiNote.sharpNoteLabels[i]);},
+                   child: Text(MidiNote.sharpNoteLabels[i]), style: ElevatedButton.styleFrom(primary: selectedNotes.contains(MidiNote.sharpNoteLabels[i]) ? Colors.amber : Colors.blue,)),
+                   for(int i = rootIndex-1; i>=0 ; i--)
+                  ElevatedButton(onPressed: () {_addNoteToScale(MidiNote.sharpNoteLabels[i]);},
+                   child: Text(MidiNote.sharpNoteLabels[i]), style: ElevatedButton.styleFrom(primary: selectedNotes.contains(MidiNote.sharpNoteLabels[i]) ? Colors.amber : Colors.blue,))
               ],
             ),
           ),

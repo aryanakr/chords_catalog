@@ -32,7 +32,12 @@ class _ScaleConfigurationScreenState extends State<ScaleConfigurationScreen> {
 
   void _addNote (String noteLabel) {
     setState(() {
-      notes.add(noteLabel);
+      if (notes.contains(noteLabel)) {
+        notes.remove(noteLabel);
+      } else {
+        notes.add(noteLabel);
+      }
+      
     });
   }
 
@@ -48,25 +53,35 @@ class _ScaleConfigurationScreenState extends State<ScaleConfigurationScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('Scale Configuration')),
-      body: Card(
-        child: Column(
-          children: [
-            Text('Intervals'),
-            Row(children: [
-              Text('Key:'),
-              DropdownButton(items: [
-              for (String noteLabel in MidiNote.sharpNoteLabels)
-                  DropdownMenuItem(
-                    child: Text(noteLabel),
-                    value: noteLabel,
-                  ),
-                ], 
-                value: scaleKey,
-                onChanged: (String? s) {if (s != null) _setScaleKey(s);}),
-            ],),
-            ScaleIntervalCreatorWidget(rootNote: scaleKey, notes: notes, addNoteCallback: _addNote),
-            ElevatedButton(onPressed: _submitScale, child: Text("Finish"))
-          ],
+      body: SingleChildScrollView(
+        scrollDirection: Axis.vertical,
+        child: Container(
+          margin: EdgeInsets.all(24),
+          child: Card(
+            child: Container(
+              margin: EdgeInsets.all(16),
+              child: Column(
+                children: [
+                  Row(children: [
+                    Text('Root Note'),
+                    SizedBox(width: 16,),
+                    DropdownButton(items: [
+                    for (String noteLabel in MidiNote.sharpNoteLabels)
+                        DropdownMenuItem(
+                          child: Text(noteLabel),
+                          value: noteLabel,
+                        ),
+                      ], 
+                      value: scaleKey,
+                      onChanged: (String? s) {if (s != null) _setScaleKey(s);}),
+                  ],),
+                  ScaleIntervalCreatorWidget(rootNote: scaleKey, notes: notes, addNoteCallback: _addNote),
+                  SizedBox(height: 50,),
+                  ElevatedButton(onPressed: _submitScale, child: Text("Finish"))
+                ],
+              ),
+            ),
+          ),
         ),
       ),
     );

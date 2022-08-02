@@ -30,12 +30,12 @@ class MyApp extends StatelessWidget {
         ),
         home: HomeScreen(),
         routes: {
-          HomeScreen.routeName: (ctx) => HomeScreen(),
-          CreateLogScreen.routeName: (ctx) => CreateLogScreen(),
-          ScaleConfigurationScreen.routeName: (ctx) => ScaleConfigurationScreen(),
-          DashboardScreen.routeName: (ctx) => DashboardScreen(),
-          CreateChordScreen.routeName: (ctx) => CreateChordScreen(),
-          ChordViewScreen.routeName: (ctx) => ChordViewScreen()
+          HomeScreen.routeName: (ctx) => const HomeScreen(),
+          CreateLogScreen.routeName: (ctx) => const CreateLogScreen(),
+          ScaleConfigurationScreen.routeName: (ctx) => const ScaleConfigurationScreen(),
+          DashboardScreen.routeName: (ctx) => const DashboardScreen(),
+          CreateChordScreen.routeName: (ctx) => const CreateChordScreen(),
+          ChordViewScreen.routeName: (ctx) => const ChordViewScreen()
         },
       ),
     );
