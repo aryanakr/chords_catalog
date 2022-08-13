@@ -81,12 +81,12 @@ class _InstrumentConfigurationWidgetState extends State<InstrumentConfigurationW
               ),
           const SizedBox(height: 8,),
           Row(children: [
-            const Text('Number of Strings'),
+            const Text('Strings', style: TextStyle(fontSize: 18),),
             NumberPicker(value: stringsNumber, update: _setStringNumber, min: 1)
           ],),
           TuningPicker(numStrings: stringsNumber, update: _setTuning, currentTuningPitches: tuning, tuningName: tuningName),
           Row(children: [
-            const Text('Sound'),
+            const Text('Sound', style: TextStyle(fontSize: 18)),
             const SizedBox(width: 24,),
             DropdownButton(items: [
               for (InstrumentSound sound in InstrumentSound.DefaultSounds)

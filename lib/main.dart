@@ -6,6 +6,7 @@ import 'package:chords_catalog/screens/create_log_screen.dart';
 import 'package:chords_catalog/screens/dashboard_screen.dart';
 import 'package:chords_catalog/screens/home_screen.dart';
 import 'package:chords_catalog/screens/scale_configuration_screen.dart';
+import 'package:chords_catalog/theme/chord_log_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -26,9 +27,11 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'Flutter Demo',
         theme: ThemeData(
-          primarySwatch: Colors.blue,
+          colorScheme: ColorScheme.fromSwatch(
+            primarySwatch: ChordLogColors.materialPrimary
+          ).copyWith(secondary:  ChordLogColors.secondary),
         ),
-        home: HomeScreen(),
+        home: const HomeScreen(),
         routes: {
           HomeScreen.routeName: (ctx) => const HomeScreen(),
           CreateLogScreen.routeName: (ctx) => const CreateLogScreen(),

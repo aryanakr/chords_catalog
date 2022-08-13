@@ -37,7 +37,7 @@ class _ScaleIntervalCreatorWidgetState extends State<ScaleIntervalCreatorWidget>
           SizedBox(height: 8,)
           ,
           SizedBox(
-            height: 130,
+            height: MediaQuery.of(context).size.width * 3 / 10,
             width: MediaQuery.of(context).size.width,
             child: GridView.count(
               padding: EdgeInsets.all(10),

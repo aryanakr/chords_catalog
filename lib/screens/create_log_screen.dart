@@ -5,6 +5,8 @@ import 'package:chords_catalog/widgets/instrument_configuration_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../theme/chord_log_colors.dart';
+
 class CreateLogScreen extends StatelessWidget {
   static const routeName = '/create-log';
 
@@ -23,16 +25,21 @@ class CreateLogScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(title: const Text('Create Log'),),
-      body: SingleChildScrollView(
-        scrollDirection: Axis.vertical,
-        child: SizedBox(
-          height: 600,
-          width: MediaQuery.of(context).size.width,
-          child: Center(
-            child: Container(
-              margin: const EdgeInsets.all(16),
-              child: Card(
-                child: InstrumentConfigurationWidget(submit: _onLogConfigSubmited),
+      body: Container(
+        height: MediaQuery.of(context).size.height,
+        decoration: const BoxDecoration(
+                  gradient: ChordLogColors.backGroundGradient),
+        child: SingleChildScrollView(
+          scrollDirection: Axis.vertical,
+          child: Container(
+            height: 600,
+            width: MediaQuery.of(context).size.width,
+            child: Center(
+              child: Container(
+                margin: const EdgeInsets.all(16),
+                child: Card(
+                  child: InstrumentConfigurationWidget(submit: _onLogConfigSubmited),
+                ),
               ),
             ),
           ),

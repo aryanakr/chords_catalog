@@ -1,5 +1,6 @@
 import 'package:chords_catalog/models/instrument.dart';
 import 'package:chords_catalog/models/note.dart';
+import 'package:chords_catalog/theme/chord_log_colors.dart';
 import 'package:flutter/material.dart';
 
 class TuningPicker extends StatefulWidget {
@@ -44,7 +45,7 @@ class _TuningPickerState extends State<TuningPicker> {
       children: [
         Row(
           children: [
-            const Text('Tuning'),
+            const Text('Tuning', style: TextStyle(fontSize: 18)),
             const SizedBox(
               width: 24,
             ),
@@ -73,7 +74,7 @@ class _TuningPickerState extends State<TuningPicker> {
         const SizedBox(
           height: 18,
         ),
-        const Text('Pitches'),
+        const Text('Pitches', style: TextStyle(fontSize: 18, color: ChordLogColors.primary)),
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           padding: const EdgeInsets.all(12),
