@@ -71,6 +71,8 @@ flutter:
    - assets/Piano.sf2
    - assets/Electric-Guitars.sf2
    - assets/chords.csv
+   - assets/tunings.json
+   - assets/scales.csv
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

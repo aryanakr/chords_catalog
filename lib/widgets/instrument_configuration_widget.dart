@@ -1,22 +1,24 @@
 import 'dart:ffi';
 
 import 'package:chords_catalog/components/number_picker.dart';
-import 'package:chords_catalog/components/tuning_picker.dart';
 import 'package:chords_catalog/models/instrument.dart';
 import 'package:chords_catalog/models/note.dart';
 import 'package:chords_catalog/screens/scale_configuration_screen.dart';
+import 'package:chords_catalog/widgets/scale_configuration_widget.dart';
+import 'package:chords_catalog/widgets/scale_interval_creator_widget.dart';
+import 'package:chords_catalog/widgets/tuning_configuration_widget.dart';
 import 'package:flutter/material.dart';
 
-class InstrumentConfigurationWidget extends StatefulWidget {
+class LogConfigurationWidget extends StatefulWidget {
   final void Function(String, Tuning, InstrumentSound) submit;
 
-  InstrumentConfigurationWidget({required this.submit});
+  LogConfigurationWidget({required this.submit});
 
   @override
-  State<InstrumentConfigurationWidget> createState() => _InstrumentConfigurationWidgetState();
+  State<LogConfigurationWidget> createState() => _LogConfigurationWidgetState();
 }
 
-class _InstrumentConfigurationWidgetState extends State<InstrumentConfigurationWidget> {
+class _LogConfigurationWidgetState extends State<LogConfigurationWidget> {
 
   // Form Values
 
@@ -25,6 +27,10 @@ class _InstrumentConfigurationWidgetState extends State<InstrumentConfigurationW
   int stringsNumber = 6;
   List<String> tuning = Tuning.standardTuning().openNotes.map((e) => e.label).toList();
   String tuningName = Tuning.standardTuning().name;
+
+  // Scale
+  String scaleRoot = 'C';
+  List<String> scaleNotes = ['C'];
 
   InstrumentSound instrumentSound = InstrumentSound.DefaultSounds[0];
 
@@ -84,7 +90,10 @@ class _InstrumentConfigurationWidgetState extends State<InstrumentConfigurationW
             const Text('Strings', style: TextStyle(fontSize: 18),),
             NumberPicker(value: stringsNumber, update: _setStringNumber, min: 1)
           ],),
-          TuningPicker(numStrings: stringsNumber, update: _setTuning, currentTuningPitches: tuning, tuningName: tuningName),
+          TuningConfigurationWidget(numStrings: stringsNumber, update: _setTuning, currentTuningPitches: tuning, tuningName: tuningName),
+          SizedBox(height: 16,),
+          ScaleConfigurationWidget(root: scaleRoot, notes: scaleNotes),
+          SizedBox(height: 16,),
           Row(children: [
             const Text('Sound', style: TextStyle(fontSize: 18)),
             const SizedBox(width: 24,),
@@ -100,7 +109,8 @@ class _InstrumentConfigurationWidgetState extends State<InstrumentConfigurationW
                   if (selectedSound != null) {
                     _setSound(selectedSound);
                   }
-                })
+                }),
+            IconButton(onPressed: (){}, icon: Icon(Icons.volume_down))
           ],),
           Expanded(child: Container(),),
           ElevatedButton(onPressed: () {

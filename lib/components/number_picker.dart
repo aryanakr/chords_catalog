@@ -1,3 +1,4 @@
+import 'package:chords_catalog/theme/chord_log_colors.dart';
 import 'package:flutter/material.dart';
 
 class NumberPicker extends StatefulWidget {
@@ -44,6 +45,7 @@ class _NumberPickerState extends State<NumberPicker> {
               onPressed: increaseValue,
               icon: const Icon(
                 Icons.arrow_drop_up,
+                color: ChordLogColors.primary,
                 size: 36,
               )),
           Container(
@@ -51,15 +53,17 @@ class _NumberPickerState extends State<NumberPicker> {
             padding: const EdgeInsets.all(12),
             child: Text(
               widget.value.toString(),
+              style: TextStyle(fontSize: 18),
             ),
-            decoration:
-                BoxDecoration(border: Border.all(color: Colors.blueAccent)),
+            decoration: BoxDecoration(
+                border: Border.all(color: ChordLogColors.primary)),
           ),
           IconButton(
             onPressed: decreaseValue,
             icon: const Icon(
-          Icons.arrow_drop_down,
-          size: 36,
+              Icons.arrow_drop_down,
+              color: ChordLogColors.primary,
+              size: 36,
             ),
           ),
         ],

@@ -32,13 +32,13 @@ class CreateLogScreen extends StatelessWidget {
         child: SingleChildScrollView(
           scrollDirection: Axis.vertical,
           child: Container(
-            height: 600,
+            height: 900,
             width: MediaQuery.of(context).size.width,
             child: Center(
               child: Container(
                 margin: const EdgeInsets.all(16),
                 child: Card(
-                  child: InstrumentConfigurationWidget(submit: _onLogConfigSubmited),
+                  child: LogConfigurationWidget(submit: _onLogConfigSubmited),
                 ),
               ),
             ),
