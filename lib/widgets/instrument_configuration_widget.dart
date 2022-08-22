@@ -2,6 +2,7 @@ import 'dart:ffi';
 
 import 'package:chords_catalog/components/number_picker.dart';
 import 'package:chords_catalog/models/instrument.dart';
+import 'package:chords_catalog/models/log_scale.dart';
 import 'package:chords_catalog/models/note.dart';
 import 'package:chords_catalog/screens/scale_configuration_screen.dart';
 import 'package:chords_catalog/widgets/scale_configuration_widget.dart';
@@ -11,8 +12,10 @@ import 'package:flutter/material.dart';
 
 class LogConfigurationWidget extends StatefulWidget {
   final void Function(String, Tuning, InstrumentSound) submit;
+  final Map<int,List<Tuning>> loadedTunings;
+  final List<BaseScale> loadedScales;
 
-  LogConfigurationWidget({required this.submit});
+  LogConfigurationWidget({required this.submit, required this.loadedTunings, required this.loadedScales});
 
   @override
   State<LogConfigurationWidget> createState() => _LogConfigurationWidgetState();
@@ -44,7 +47,10 @@ class _LogConfigurationWidgetState extends State<LogConfigurationWidget> {
           i < prevTuning.length ? prevTuning[i] : ''
       ];
 
-      tuningName = Tuning.customTuningName;
+      tuningName = widget.loadedTunings[stringsNumber]?[0].name ?? '';
+      if (tuningName.isNotEmpty) {
+        tuning = widget.loadedTunings[stringsNumber]![0].openNotes.map((e) => e.label).toList();
+      }
     
     });
   }
@@ -90,9 +96,15 @@ class _LogConfigurationWidgetState extends State<LogConfigurationWidget> {
             const Text('Strings', style: TextStyle(fontSize: 18),),
             NumberPicker(value: stringsNumber, update: _setStringNumber, min: 1)
           ],),
-          TuningConfigurationWidget(numStrings: stringsNumber, update: _setTuning, currentTuningPitches: tuning, tuningName: tuningName),
+          TuningConfigurationWidget(
+            numStrings: stringsNumber, 
+            update: _setTuning, 
+            currentTuningPitches: tuning, 
+            tuningName: tuningName, 
+            defaultTunings: widget.loadedTunings[stringsNumber] ?? [],
+            ),
           SizedBox(height: 16,),
-          ScaleConfigurationWidget(root: scaleRoot, notes: scaleNotes),
+          ScaleConfigurationWidget(root: scaleRoot, notes: scaleNotes, defaultScales: widget.loadedScales,),
           SizedBox(height: 16,),
           Row(children: [
             const Text('Sound', style: TextStyle(fontSize: 18)),

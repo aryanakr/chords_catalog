@@ -1,10 +1,7 @@
+import 'dart:convert';
+
 import 'package:chords_catalog/models/note.dart';
-
-class Instrument {
-
-  
-
-}
+import 'package:flutter/services.dart';
 
 class InstrumentSound {
   String path;
@@ -40,6 +37,13 @@ class Tuning {
     name = 'Standard';
     numStrings = 6;
 
+  }
+
+  static Future<Map<String, dynamic>> loadLib() async {
+    final String response = await rootBundle.loadString('assets/tunings.json');
+    final Map<String, dynamic> data = await json.decode(response);
+
+    return data;
   }
 
   static List<Tuning> retrieveKnownTuningForStrings(int numStrings) {

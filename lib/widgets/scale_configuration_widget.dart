@@ -1,4 +1,6 @@
 import 'package:chords_catalog/components/painters/scale_interval_strip_painter.dart';
+import 'package:chords_catalog/models/log_scale.dart';
+import 'package:chords_catalog/models/note.dart';
 import 'package:flutter/material.dart';
 
 import '../theme/chord_log_colors.dart';
@@ -7,16 +9,20 @@ class ScaleConfigurationWidget extends StatefulWidget {
 
   final String root;
   final List<String> notes;
+  final List<BaseScale> defaultScales;
 
-  const ScaleConfigurationWidget({Key? key, required this.root, required this.notes}) : super(key: key);
+  const ScaleConfigurationWidget({Key? key, required this.root, required this.notes, required this.defaultScales}) : super(key: key);
 
   @override
   State<ScaleConfigurationWidget> createState() => _ScaleConfigurationWidgetState();
 }
 
 class _ScaleConfigurationWidgetState extends State<ScaleConfigurationWidget> {
+  
   @override
   Widget build(BuildContext context) {
+    List<int> scaleIntervals = widget.defaultScales[0].intervals;
+
     return Container(
       decoration: BoxDecoration(
           border: Border.all(width: 1.5, color: ChordLogColors.primary)),
@@ -34,12 +40,13 @@ class _ScaleConfigurationWidgetState extends State<ScaleConfigurationWidget> {
                     child: DropdownButton(
                       alignment: Alignment.centerRight,
                       items: [
-                        DropdownMenuItem(
-                          child: Text('t'),
-                          value: 't',
-                        ),
+                        for (final note in MidiNote.sharpNoteLabels)
+                          DropdownMenuItem(
+                            child: Text(note),
+                            value: note,
+                          ),
                       ],
-                      value: 't',
+                      value: widget.root,
                       onChanged: (String? t) {},
                       isExpanded: true,
                     ),
@@ -52,15 +59,15 @@ class _ScaleConfigurationWidgetState extends State<ScaleConfigurationWidget> {
               SizedBox(
                 width: 150,
                 child: DropdownButton(
-                  alignment: Alignment.centerRight,
                   items: [
-                    DropdownMenuItem(
-                      child: Text('t'),
-                      value: 't',
-                    ),
+                    for (BaseScale baseScale in widget.defaultScales)
+                      DropdownMenuItem(
+                        child: Text(baseScale.name),
+                        value: baseScale.intervals,
+                      ),
                   ],
-                  value: 't',
-                  onChanged: (String? t) {},
+                  value: scaleIntervals,
+                  onChanged: (List<int>? base) {},
                   isExpanded: true,
                 ),
               ),

@@ -6,10 +6,10 @@ import '../models/instrument.dart';
 import '../theme/chord_log_colors.dart';
 
 class TuningConfigurationWidget extends StatefulWidget {
-
   final int numStrings;
   final String tuningName;
   List<String> currentTuningPitches;
+  List<Tuning> defaultTunings;
   final void Function(String, List<String>) update;
 
   TuningConfigurationWidget(
@@ -17,11 +17,13 @@ class TuningConfigurationWidget extends StatefulWidget {
       required this.numStrings,
       required this.tuningName,
       required this.currentTuningPitches,
+      required this.defaultTunings,
       required this.update})
       : super(key: key);
 
   @override
-  State<TuningConfigurationWidget> createState() => _TuningConfigurationWidgetState();
+  State<TuningConfigurationWidget> createState() =>
+      _TuningConfigurationWidgetState();
 }
 
 class _TuningConfigurationWidgetState extends State<TuningConfigurationWidget> {
@@ -41,8 +43,7 @@ class _TuningConfigurationWidgetState extends State<TuningConfigurationWidget> {
 
   @override
   Widget build(BuildContext context) {
-    List<Tuning> tuningsList =
-        Tuning.retrieveKnownTuningForStrings(widget.numStrings);
+    List<Tuning> tuningsList = widget.defaultTunings;
 
     return Container(
       decoration: BoxDecoration(
@@ -83,7 +84,12 @@ class _TuningConfigurationWidgetState extends State<TuningConfigurationWidget> {
                 ),
               ),
               TextButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    showDialog(
+                        context: context,
+                        builder: (BuildContext context) =>
+                            createTunningDialog());
+                  },
                   child: Row(
                     children: [Text("New"), Icon(Icons.add)],
                   ))
@@ -104,9 +110,10 @@ class _TuningConfigurationWidgetState extends State<TuningConfigurationWidget> {
                     children: [
                       CustomPaint(
                         size: Size(35, 35),
-                        painter: StringNumberPainter(number: widget.numStrings - i),
+                        painter:
+                            StringNumberPainter(number: widget.numStrings - i),
                       ),
-                      SizedBox(width: 8),
+                      const SizedBox(width: 8),
                       Text(widget.currentTuningPitches[i])
                     ],
                   )
@@ -114,6 +121,83 @@ class _TuningConfigurationWidgetState extends State<TuningConfigurationWidget> {
             ),
           )
         ],
+      ),
+    );
+  }
+
+  Dialog createTunningDialog() {
+    String name = '';
+    List<String> pitches = widget.currentTuningPitches;
+
+    return Dialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      elevation: 8,
+      child: SingleChildScrollView(
+        child: Container(
+          margin: EdgeInsets.all(16),
+          child: Column(
+            children: [
+              Text(
+                'New Tuning',
+                style: TextStyle(color: ChordLogColors.primary, fontSize: 18),
+              ),
+              SizedBox(
+                height: 16,
+              ),
+              TextField(
+                decoration: InputDecoration(
+                    labelText: 'Tuning Name', hintText: 'Tuning Name'),
+                onChanged: (String text) {
+                  name = text;
+                },
+              ),
+              SizedBox(
+                height: 32,
+              ),
+              StaggeredGrid.count(
+                crossAxisCount: 3,
+                crossAxisSpacing: 8,
+                mainAxisSpacing: 12,
+                children: [
+                  for (int i = 0; i < widget.numStrings; i++)
+                    Container(
+                      color: ChordLogColors.secondary,
+                      padding: EdgeInsets.only(top: 8),
+                      child: Column(
+                        children: [
+                          CustomPaint(
+                            size: Size(30, 30),
+                            painter:
+                                StringNumberPainter(number: widget.numStrings - i),
+                          ),
+                          const SizedBox(height: 2),
+                          TextButton(
+                              onPressed: () {},
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  Text(pitches[i], style: TextStyle(fontSize: 20),),
+                                  SizedBox(
+                                    width: 0,
+                                  ),
+                                  Icon(Icons.arrow_drop_down_circle_outlined)
+                                ],
+                              ))
+                        ],
+                      ),
+                    )
+                ],
+              ),
+              SizedBox(height: 16,),
+              ElevatedButton(
+                onPressed: () {
+                  print(name);
+                  Navigator.of(context).pop();
+                },
+                child: Text('Create', style: TextStyle(fontSize: 18),)),
+            ],
+          ),
+        ),
       ),
     );
   }
