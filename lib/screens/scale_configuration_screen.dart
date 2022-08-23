@@ -75,7 +75,6 @@ class _ScaleConfigurationScreenState extends State<ScaleConfigurationScreen> {
                       value: scaleKey,
                       onChanged: (String? s) {if (s != null) _setScaleKey(s);}),
                   ],),
-                  ScaleIntervalCreatorWidget(rootNote: scaleKey, notes: notes, addNoteCallback: _addNote),
                   SizedBox(height: 50,),
                   ElevatedButton(onPressed: _submitScale, child: Text("Finish"))
                 ],

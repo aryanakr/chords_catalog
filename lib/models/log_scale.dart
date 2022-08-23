@@ -21,24 +21,29 @@ class LogScale {
 class BaseScale {
   final String name;
   final List<int> intervals;
+  final bool isCustomScale;
 
-  BaseScale({required this.name, required this.intervals});
+  BaseScale({required this.name, required this.intervals, this.isCustomScale = false});
 
-  LogScale createLogScale(String rootKey) {
-    final keyIndex = MidiNote.sharpNoteLabels.indexOf(rootKey);
+  List<String> getNotes(String rootKey) {
+    final allNotes = MidiNote.sharpNoteLabelsFromKey(rootKey);
 
-    final List<String> notes = [MidiNote.sharpNoteLabels[keyIndex]];
+    final List<String> res = [];
 
-    int currIndex = keyIndex;
-    for (final interval in intervals) {
-      if (currIndex+interval >= MidiNote.sharpNoteLabels.length) {
-        currIndex =  (currIndex + interval) - MidiNote.sharpNoteLabels.length;
-      } else {
-        currIndex += interval;
-      }
-      notes.add(MidiNote.sharpNoteLabels[currIndex]);
+    final List<int> tmpIntervals = [];
+    tmpIntervals.addAll(intervals);
+    tmpIntervals.removeLast();
+
+    int index = 0;
+    for (int interval in tmpIntervals) {
+      index += interval;
+      res.add(allNotes[index]);
     }
 
-    return LogScale(root: rootKey, notes: notes);
+    return res;
+  }
+
+  LogScale createLogScale(String rootKey) {
+    return LogScale(root: rootKey, notes: getNotes(rootKey));
   }
 }

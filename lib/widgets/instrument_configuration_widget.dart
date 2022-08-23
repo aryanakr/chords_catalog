@@ -34,12 +34,21 @@ class _LogConfigurationWidgetState extends State<LogConfigurationWidget> {
   String scaleRoot = 'C';
   List<String> scaleNotes = ['C'];
 
+  late BaseScale scaleBase;
+  late LogScale scale;
+
   InstrumentSound instrumentSound = InstrumentSound.DefaultSounds[0];
+
+  @override
+  void initState() {
+    scaleBase = widget.loadedScales[0];
+    scale = scaleBase.createLogScale(scaleRoot);
+    super.initState();
+  }
 
   void _setStringNumber(int value) {
     setState(() {
       stringsNumber = value;
-      final prevTuning = tuning;
 
       final newTuningName = widget.loadedTunings[stringsNumber]?[0].name ?? '';
       if (newTuningName.isNotEmpty) {
@@ -58,6 +67,27 @@ class _LogConfigurationWidgetState extends State<LogConfigurationWidget> {
   void _setTuning(Tuning newTuning) {
     setState(() {
       tuning = newTuning;
+    });
+  }
+
+  void _setScale(String root, BaseScale baseScale) {
+    setState(() {
+      scaleRoot = root;
+      scaleBase = baseScale;
+
+      final allNotes = MidiNote.sharpNoteLabelsFromKey(scaleRoot);
+
+      final List<int> intervals = [];
+      intervals.addAll(scaleBase.intervals);
+      intervals.removeLast();
+
+      int index = 0;
+      for (int interval in intervals) {
+        index += interval;
+        scaleNotes.add(allNotes[index]);
+      }
+      
+      scale = LogScale(root: scaleRoot, notes: scaleNotes);
     });
   }
 
@@ -98,9 +128,9 @@ class _LogConfigurationWidgetState extends State<LogConfigurationWidget> {
             currentTuning: tuning, 
             defaultTunings: widget.loadedTunings[stringsNumber] ?? [],
             ),
-          SizedBox(height: 16,),
-          ScaleConfigurationWidget(root: scaleRoot, notes: scaleNotes, defaultScales: widget.loadedScales,),
-          SizedBox(height: 16,),
+          const SizedBox(height: 16,),
+          ScaleConfigurationWidget(root: scaleRoot, baseScale: scaleBase, defaultScales: widget.loadedScales, submit: _setScale),
+          const SizedBox(height: 16,),
           Row(children: [
             const Text('Sound', style: TextStyle(fontSize: 18)),
             const SizedBox(width: 24,),

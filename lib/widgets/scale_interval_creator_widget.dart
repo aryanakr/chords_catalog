@@ -1,29 +1,32 @@
 import 'package:chords_catalog/components/painters/scale_interval_strip_painter.dart';
+import 'package:chords_catalog/models/log_scale.dart';
 import 'package:chords_catalog/models/note.dart';
 import 'package:flutter/material.dart';
 
 class ScaleIntervalCreatorWidget extends StatefulWidget {
   final String rootNote;
-  final List<String> notes;
-  final void Function(String) addNoteCallback;
+  final BaseScale currentScale;
+  final void Function(BaseScale) submit;
 
-  ScaleIntervalCreatorWidget({required this.rootNote, required this.notes, required this.addNoteCallback});
+  ScaleIntervalCreatorWidget({required this.rootNote, required this.currentScale, required this.submit});
 
   @override
   State<ScaleIntervalCreatorWidget> createState() => _ScaleIntervalCreatorWidgetState();
 }
 
 class _ScaleIntervalCreatorWidgetState extends State<ScaleIntervalCreatorWidget> {
-
+  final _nameController = TextEditingController();
   
   @override
   Widget build(BuildContext context) {
 
-    final selectedNotes = widget.notes;
+    final selectedNotes = [widget.rootNote];
     final rootIndex = MidiNote.sharpNoteLabels.indexOf(widget.rootNote);
 
     void _addNoteToScale (String noteLabel) {
-      widget.addNoteCallback(noteLabel);
+      setState(() {
+        
+      });
     }
 
 
@@ -32,7 +35,7 @@ class _ScaleIntervalCreatorWidgetState extends State<ScaleIntervalCreatorWidget>
         children: [
           CustomPaint(
             size: Size(MediaQuery.of(context).size.width-50, 70),
-            painter: ScaleIntervalStripPainter(root: widget.rootNote, notes: widget.notes),
+            painter: ScaleIntervalStripPainter(root: widget.rootNote, notes: [widget.rootNote]),
           ),
           SizedBox(height: 8,)
           ,
@@ -54,6 +57,7 @@ class _ScaleIntervalCreatorWidgetState extends State<ScaleIntervalCreatorWidget>
               ],
             ),
           ),
+          ElevatedButton(onPressed: (){Navigator.of(context).pop();}, child: Text('Submit'))
         ],
       ),
     );
