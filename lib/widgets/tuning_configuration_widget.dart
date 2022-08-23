@@ -1,5 +1,4 @@
 import 'package:chords_catalog/models/note.dart';
-import 'package:chords_catalog/widgets/tuning_creator_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_picker/flutter_picker.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
@@ -171,17 +170,6 @@ class _TuningConfigurationWidgetState extends State<TuningConfigurationWidget> {
             ),
           )
         ],
-      ),
-    );
-  }
-
-  Dialog createTunningDialog() {
-
-    return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      elevation: 8,
-      child: SingleChildScrollView(
-        child: TuningCreatorWidget(initialTuning: widget.currentTuning, submit: (Tuning newTuning){},parentContext: context,)
       ),
     );
   }
