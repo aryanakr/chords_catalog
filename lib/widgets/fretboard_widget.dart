@@ -21,7 +21,7 @@ class FretboardWidget extends StatelessWidget {
       child: ListView.separated(
           scrollDirection: Axis.horizontal,
           itemBuilder: (BuildContext context, int index) {
-            var notes = Provider.of<LogProvider>(context).tuning!.openNotes.reversed.map((e) => MidiNote.byMidiNumber(midiNumber: e.midiNumber + index)).toList();
+            var notes = Provider.of<LogProvider>(context).tuning!.openNotes.reversed.map((e) => MidiNote.byMidiNumber(midiNumber: e!.midiNumber + index)).toList();
             return Container(
                 color: Colors.red,
                 child: FretboardFret(

@@ -18,7 +18,7 @@ class InstrumentSound {
 
 class Tuning {
   late String name;
-  late List<MidiNote> openNotes;
+  late List<MidiNote?> openNotes;
   late bool isCustomTuning;
   late int numStrings;
 
@@ -44,15 +44,6 @@ class Tuning {
     final Map<String, dynamic> data = await json.decode(response);
 
     return data;
-  }
-
-  static List<Tuning> retrieveKnownTuningForStrings(int numStrings) {
-    Tuning custom = Tuning(name: customTuningName, openNotes: [], numStrings: numStrings, isCustomTuning: true);
-    if (numStrings == 6) {
-      return [custom, Tuning.standardTuning()];
-    }
-
-    return [custom];
   }
 
   static String customTuningName =  'Custom';

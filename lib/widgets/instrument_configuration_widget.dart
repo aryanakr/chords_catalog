@@ -24,12 +24,11 @@ class LogConfigurationWidget extends StatefulWidget {
 class _LogConfigurationWidgetState extends State<LogConfigurationWidget> {
 
   // Form Values
-
   final _nameController = TextEditingController();
+
   // Tuning
   int stringsNumber = 6;
-  List<String> tuning = Tuning.standardTuning().openNotes.map((e) => e.label).toList();
-  String tuningName = Tuning.standardTuning().name;
+  Tuning tuning = Tuning.standardTuning();
 
   // Scale
   String scaleRoot = 'C';
@@ -42,23 +41,23 @@ class _LogConfigurationWidgetState extends State<LogConfigurationWidget> {
       stringsNumber = value;
       final prevTuning = tuning;
 
-      tuning = [
-        for (int i =0 ; i<stringsNumber;  i++)
-          i < prevTuning.length ? prevTuning[i] : ''
-      ];
-
-      tuningName = widget.loadedTunings[stringsNumber]?[0].name ?? '';
-      if (tuningName.isNotEmpty) {
-        tuning = widget.loadedTunings[stringsNumber]![0].openNotes.map((e) => e.label).toList();
+      final newTuningName = widget.loadedTunings[stringsNumber]?[0].name ?? '';
+      if (newTuningName.isNotEmpty) {
+        tuning = widget.loadedTunings[stringsNumber]![0];
+      } else {
+        final List<MidiNote?> newPitches = [
+          for (int i =0 ; i<stringsNumber;  i++) 
+            i < tuning.openNotes.length ? tuning.openNotes[i] : null
+        ];
+        tuning = Tuning(name: Tuning.customTuningName,numStrings: stringsNumber, openNotes: newPitches, isCustomTuning: true);
       }
     
     });
   }
 
-  void _setTuning(String name, List<String> selTuning) {
+  void _setTuning(Tuning newTuning) {
     setState(() {
-      tuning = selTuning;
-      tuningName = name;
+      tuning = newTuning;
     });
   }
 
@@ -72,12 +71,10 @@ class _LogConfigurationWidgetState extends State<LogConfigurationWidget> {
     if (_nameController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Please name this log!')));
     }
-    else if (tuning.any((element) => element == '')) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Please fill all pitches!')));
+    else if (tuning.openNotes.any((element) => element == null)) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Please fill all the tuning pitches!')));
     } else {
-      final midiNotes = tuning.map((e) => MidiNote.byLabel(label: e)).toList();
-      final finalTuning = Tuning(name: tuningName, openNotes: midiNotes, numStrings: stringsNumber);
-      widget.submit(_nameController.text, finalTuning, instrumentSound);
+      widget.submit(_nameController.text, tuning, instrumentSound);
     }
   }
 
@@ -97,10 +94,8 @@ class _LogConfigurationWidgetState extends State<LogConfigurationWidget> {
             NumberPicker(value: stringsNumber, update: _setStringNumber, min: 1)
           ],),
           TuningConfigurationWidget(
-            numStrings: stringsNumber, 
             update: _setTuning, 
-            currentTuningPitches: tuning, 
-            tuningName: tuningName, 
+            currentTuning: tuning, 
             defaultTunings: widget.loadedTunings[stringsNumber] ?? [],
             ),
           SizedBox(height: 16,),

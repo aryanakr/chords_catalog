@@ -8,6 +8,10 @@ class MidiNote {
     return label.replaceAll(RegExp('[-0-9]'),'');
   }
 
+  int getNoteOctave() {
+    return int.parse(label.replaceAll(RegExp('[^-0-9]'), ''));
+  }
+
   MidiNote.byMidiNumber({required this.midiNumber}) {
 
     String noteLabel = sharpNoteLabels[midiNumber % 12];
