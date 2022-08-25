@@ -115,7 +115,7 @@ class _LogConfigurationWidgetState extends State<LogConfigurationWidget> {
       child: Column(
         children: [
           TextField(
-                decoration: const InputDecoration(labelText: 'Log Name'),
+                decoration: const InputDecoration(labelText: 'Log Name', hintText: 'New Log'),
                 controller: _nameController,
               ),
           const SizedBox(height: 8,),

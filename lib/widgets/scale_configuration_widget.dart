@@ -22,10 +22,8 @@ class ScaleConfigurationWidget extends StatefulWidget {
 class _ScaleConfigurationWidgetState extends State<ScaleConfigurationWidget> {
 
   void _submitNewScale(BaseScale base) {
-
+    widget.submit(widget.root, base);
   }
-
-
 
   Dialog createIntervalConfigDialog() {
     return Dialog(
@@ -82,7 +80,7 @@ class _ScaleConfigurationWidgetState extends State<ScaleConfigurationWidget> {
             children: [
               SizedBox(
                 width: 150,
-                child: DropdownButton(
+                child: widget.baseScale.isCustomScale? Text(widget.baseScale.name, style: TextStyle(fontSize: 18),textAlign: TextAlign.center,) : DropdownButton(
                   items: [
                     for (BaseScale baseScale in widget.defaultScales)
                       DropdownMenuItem(

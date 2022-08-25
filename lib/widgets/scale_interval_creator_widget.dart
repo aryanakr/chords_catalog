@@ -1,64 +1,151 @@
 import 'package:chords_catalog/components/painters/scale_interval_strip_painter.dart';
 import 'package:chords_catalog/models/log_scale.dart';
 import 'package:chords_catalog/models/note.dart';
+import 'package:chords_catalog/theme/chord_log_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
 class ScaleIntervalCreatorWidget extends StatefulWidget {
   final String rootNote;
   final BaseScale currentScale;
   final void Function(BaseScale) submit;
 
-  ScaleIntervalCreatorWidget({required this.rootNote, required this.currentScale, required this.submit});
+  ScaleIntervalCreatorWidget(
+      {required this.rootNote,
+      required this.currentScale,
+      required this.submit});
 
   @override
-  State<ScaleIntervalCreatorWidget> createState() => _ScaleIntervalCreatorWidgetState();
+  State<ScaleIntervalCreatorWidget> createState() =>
+      _ScaleIntervalCreatorWidgetState();
 }
 
-class _ScaleIntervalCreatorWidgetState extends State<ScaleIntervalCreatorWidget> {
+class _ScaleIntervalCreatorWidgetState
+    extends State<ScaleIntervalCreatorWidget> {
   final _nameController = TextEditingController();
-  
+  late List<String> selectedNotes;
+  late int rootIndex;
+
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    // TODO: implement initState
+    selectedNotes = [widget.rootNote];
+    rootIndex = MidiNote.sharpNoteLabels.indexOf(widget.rootNote);
+    super.initState();
+  }
 
-    final selectedNotes = [widget.rootNote];
-    final rootIndex = MidiNote.sharpNoteLabels.indexOf(widget.rootNote);
+  void _addNoteToScale(String noteLabel) {
+    setState(() {
+      final index = selectedNotes.indexOf(noteLabel);
+      if (index == -1) {
+        selectedNotes.add(noteLabel);
+      } else {
+        selectedNotes.removeAt(index);
+      }
+    });
+  }
 
-    void _addNoteToScale (String noteLabel) {
-      setState(() {
-        
-      });
+  void _submit () {
+    List<int> intervals = [];
+    final notesList = MidiNote.sharpNoteLabelsFromKey(widget.rootNote);
+
+    int index = 1;
+    String lastNote = widget.rootNote;
+    for (int i = 1 ; i<notesList.length ; i++) {
+      if (selectedNotes.contains(notesList[i])) {
+        intervals.add(index);
+        lastNote = notesList[i];
+        index = 1;
+      } else {
+        index ++;
+      }
     }
 
+    final lastNoteList = MidiNote.sharpNoteLabelsFromKey(lastNote);
+    int lastNoteInterval = lastNoteList.indexOf(lastNote);
+    if (lastNoteInterval == 0) {
+      lastNoteInterval = 12;
+    }
+    
+    intervals.add(lastNoteInterval);
 
-    return Container(
-      child: Column(
-        children: [
-          CustomPaint(
-            size: Size(MediaQuery.of(context).size.width-50, 70),
-            painter: ScaleIntervalStripPainter(root: widget.rootNote, notes: [widget.rootNote]),
-          ),
-          SizedBox(height: 8,)
-          ,
-          SizedBox(
-            height: MediaQuery.of(context).size.width * 3 / 10,
-            width: MediaQuery.of(context).size.width,
-            child: GridView.count(
-              padding: EdgeInsets.all(10),
-              crossAxisSpacing: 5,
-              mainAxisSpacing: 5,
-              crossAxisCount: 6,
-              children: [
-                for(int i = rootIndex; i<MidiNote.sharpNoteLabels.length ; i++)
-                  ElevatedButton(onPressed: i == rootIndex ? null: () {_addNoteToScale(MidiNote.sharpNoteLabels[i]);},
-                   child: Text(MidiNote.sharpNoteLabels[i]), style: ElevatedButton.styleFrom(primary: selectedNotes.contains(MidiNote.sharpNoteLabels[i]) ? Colors.amber : Colors.blue,)),
-                   for(int i = rootIndex-1; i>=0 ; i--)
-                  ElevatedButton(onPressed: () {_addNoteToScale(MidiNote.sharpNoteLabels[i]);},
-                   child: Text(MidiNote.sharpNoteLabels[i]), style: ElevatedButton.styleFrom(primary: selectedNotes.contains(MidiNote.sharpNoteLabels[i]) ? Colors.amber : Colors.blue,))
-              ],
+    setState(() {
+      final resBaseScale = BaseScale(name: _nameController.text, intervals: intervals, isCustomScale: true);
+      widget.submit(resBaseScale);
+      Navigator.of(context).pop();
+    });
+
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      child: Container(
+        margin: EdgeInsets.all(16),
+        child: Column(
+          children: [
+            Text(
+              'Set Scale Notes',
+              style: TextStyle(color: ChordLogColors.primary, fontSize: 18),
             ),
-          ),
-          ElevatedButton(onPressed: (){Navigator.of(context).pop();}, child: Text('Submit'))
-        ],
+            SizedBox(
+              height: 16,
+            ),
+            TextField(decoration: const InputDecoration(labelText: 'Name', hintText: 'New Scale'), controller: _nameController,),
+            SizedBox(height: 16,),
+            CustomPaint(
+              size: Size(MediaQuery.of(context).size.width - 50, 70),
+              painter: ScaleIntervalStripPainter(
+                  root: widget.rootNote, notes: selectedNotes),
+            ),
+            SizedBox(
+              height: 8,
+            ),
+            SizedBox(
+              child: StaggeredGrid.count(
+                crossAxisCount: 4,
+                crossAxisSpacing: 6,
+                mainAxisSpacing: 0,
+                children: [
+                  for (int i = rootIndex;
+                      i < MidiNote.sharpNoteLabels.length;
+                      i++)
+                    ElevatedButton(
+                        onPressed: i == rootIndex
+                            ? null
+                            : () {
+                                _addNoteToScale(MidiNote.sharpNoteLabels[i]);
+                              },
+                        child: Text(MidiNote.sharpNoteLabels[i]),
+                        style: ElevatedButton.styleFrom(
+                          primary: selectedNotes
+                                  .contains(MidiNote.sharpNoteLabels[i])
+                              ? Colors.amber
+                              : Colors.blue,
+                        )),
+                  for (int i = rootIndex - 1; i >= 0; i--)
+                    ElevatedButton(
+                        onPressed: () {
+                          _addNoteToScale(MidiNote.sharpNoteLabels[i]);
+                        },
+                        child: Text(MidiNote.sharpNoteLabels[i]),
+                        style: ElevatedButton.styleFrom(
+                          primary: selectedNotes
+                                  .contains(MidiNote.sharpNoteLabels[i])
+                              ? Colors.amber
+                              : Colors.blue,
+                        ))
+                ],
+              ),
+            ),
+            SizedBox(
+              height: 32,
+            ),
+            ElevatedButton(
+                onPressed: _submit,
+                child: Text('Submit'))
+          ],
+        ),
       ),
     );
   }
