@@ -8,7 +8,7 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 class ScaleIntervalCreatorWidget extends StatefulWidget {
   final String rootNote;
   final BaseScale currentScale;
-  final void Function(BaseScale) submit;
+  final void Function(BaseScale?) submit;
 
   ScaleIntervalCreatorWidget(
       {required this.rootNote,
@@ -141,9 +141,16 @@ class _ScaleIntervalCreatorWidgetState
             SizedBox(
               height: 32,
             ),
-            ElevatedButton(
-                onPressed: _submit,
-                child: Text('Submit'))
+            Row(
+              children: [
+                ElevatedButton(
+                    onPressed: _submit,
+                    child: Text('Submit')),
+                widget.currentScale.isCustomScale ? TextButton(onPressed: (){widget.submit(null);
+                Navigator.of(context).pop();
+                }, child: Text('Discard')) : TextButton(onPressed: (){Navigator.of(context).pop();}, child: Text('Cancel'))
+              ],
+            )
           ],
         ),
       ),

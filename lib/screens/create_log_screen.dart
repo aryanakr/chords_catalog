@@ -55,7 +55,7 @@ class CreateLogScreen extends StatelessWidget {
 
       for (int i = 1; i < data.length; i++) {
         final List<int> intervals = data[i][1].toString().split(',').map((e) => int.parse(e)).toList();
-        res.add(BaseScale(name: data[i][0], intervals: intervals));
+        res.add(BaseScale(name: data[i][0], intervals: intervals, isCustomScale: false));
       }
       return res;
     }

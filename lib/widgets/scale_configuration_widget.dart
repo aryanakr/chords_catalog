@@ -21,8 +21,13 @@ class ScaleConfigurationWidget extends StatefulWidget {
 
 class _ScaleConfigurationWidgetState extends State<ScaleConfigurationWidget> {
 
-  void _submitNewScale(BaseScale base) {
-    widget.submit(widget.root, base);
+  void _submitNewScale(BaseScale? base) {
+
+    if (base == null) {
+      widget.submit(widget.root, widget.defaultScales[0]);
+    } else {
+      widget.submit(widget.root, base);
+    }
   }
 
   Dialog createIntervalConfigDialog() {
@@ -35,7 +40,7 @@ class _ScaleConfigurationWidgetState extends State<ScaleConfigurationWidget> {
         rootNote: widget.root,
         submit: _submitNewScale,
         currentScale: widget.baseScale.isCustomScale ? widget.baseScale : BaseScale(name: '', intervals: [],
-        isCustomScale: true)),
+        isCustomScale: false)),
     );
   }
   
@@ -104,7 +109,7 @@ class _ScaleConfigurationWidgetState extends State<ScaleConfigurationWidget> {
                     return createIntervalConfigDialog();
                   });},
                   child: Row(
-                    children: [Text("New"), Icon(Icons.add)],
+                    children: widget.baseScale.isCustomScale ? [Text("Edit"), Icon(Icons.edit)] : [Text("New"), Icon(Icons.add)],
                   ))
             ],
           ),
