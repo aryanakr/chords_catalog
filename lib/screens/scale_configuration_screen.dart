@@ -44,9 +44,9 @@ class _ScaleConfigurationScreenState extends State<ScaleConfigurationScreen> {
   void _submitScale() {
     print(notes);
 
-    Provider.of<LogProvider>(context, listen: false).setLogScale(LogScale(root: scaleKey, notes: notes));
+    //Provider.of<LogProvider>(context, listen: false).setLogScale(LogScale(root: scaleKey, notes: notes));
 
-    Navigator.of(context).pushNamed(DashboardScreen.routeName);
+    //Navigator.of(context).pushNamed(DashboardScreen.routeName);
   }
 
   @override

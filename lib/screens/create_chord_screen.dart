@@ -196,7 +196,7 @@ class _CreateChordScreenState extends State<CreateChordScreen> {
                           value: selectedChordIndex,
                           onChanged: (int? index) {
                             if (index != null  && index >= 0){
-                              Chord newChord = Chord(root: dataFiltered[index][0].toString(), type: dataFiltered[index][1].toString(), structure:  dataFiltered[index][2].toString(), noteLabels: dataFiltered[index][3].toString().split(','));
+                              Chord newChord = Chord.createChordFromLibRow(dataFiltered[index]);
                               _setChordType(newChord, index);
                             }
                             else {

@@ -35,7 +35,6 @@ class MyApp extends StatelessWidget {
         routes: {
           HomeScreen.routeName: (ctx) => const HomeScreen(),
           CreateLogScreen.routeName: (ctx) => const CreateLogScreen(),
-          ScaleConfigurationScreen.routeName: (ctx) => const ScaleConfigurationScreen(),
           DashboardScreen.routeName: (ctx) => const DashboardScreen(),
           CreateChordScreen.routeName: (ctx) => const CreateChordScreen(),
           ChordViewScreen.routeName: (ctx) => const ChordViewScreen()

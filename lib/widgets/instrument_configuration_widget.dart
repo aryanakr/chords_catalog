@@ -11,7 +11,7 @@ import 'package:chords_catalog/widgets/tuning_configuration_widget.dart';
 import 'package:flutter/material.dart';
 
 class LogConfigurationWidget extends StatefulWidget {
-  final void Function(String, Tuning, InstrumentSound) submit;
+  final void Function(String, Tuning, InstrumentSound, LogScale) submit;
   final Map<int,List<Tuning>> loadedTunings;
   final List<BaseScale> loadedScales;
 
@@ -76,18 +76,23 @@ class _LogConfigurationWidgetState extends State<LogConfigurationWidget> {
       scaleBase = baseScale;
 
       final allNotes = MidiNote.sharpNoteLabelsFromKey(scaleRoot);
-
+      print('allNotes: $allNotes');
       final List<int> intervals = [];
       intervals.addAll(scaleBase.intervals);
       intervals.removeLast();
 
+      scaleNotes.clear();
+      scaleNotes.add(scaleRoot);
+
       int index = 0;
       for (int interval in intervals) {
         index += interval;
+        final newNote = allNotes[index];
+        print('interval $interval adding  '+newNote);
         scaleNotes.add(allNotes[index]);
       }
       
-      scale = LogScale(root: scaleRoot, notes: scaleNotes);
+      scale = LogScale(root: scaleRoot, notes: scaleNotes, base: baseScale);
     });
   }
 
@@ -104,7 +109,7 @@ class _LogConfigurationWidgetState extends State<LogConfigurationWidget> {
     else if (tuning.openNotes.any((element) => element == null)) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Please fill all the tuning pitches!')));
     } else {
-      widget.submit(_nameController.text, tuning, instrumentSound);
+      widget.submit(_nameController.text, tuning, instrumentSound, scale);
     }
   }
 

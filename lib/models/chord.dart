@@ -9,7 +9,7 @@ class Chord {
   final String root;
   final String type;
   final String structure;
-  final List<String> noteLabels;
+  List<String> noteLabels;
 
   Chord({required this.root, required this.type, required this.structure, required this.noteLabels});
 
@@ -19,6 +19,15 @@ class Chord {
     final List<List<dynamic>> data = CsvToListConverter().convert(rawData);
 
     return data;
+  }
+
+  static Chord createChordFromLibRow(List<dynamic> row) {
+    final root = row[0].toString();
+    final type = row[1].toString();
+    final structure = row[2].toString();
+    final noteLabels = row[3].toString().split(',');
+
+    return Chord(root: root, type: type, structure: structure, noteLabels: noteLabels);
   }
   
 }

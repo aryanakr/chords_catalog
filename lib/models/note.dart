@@ -41,7 +41,7 @@ class MidiNote {
       res.add(sharpNoteLabels[i]);
     }
 
-    for (int i = keyIndex-1 ; i >= 0 ; i--) {
+    for (int i = 0 ; i < keyIndex ; i++) {
       res.add(sharpNoteLabels[i]);
     }
 

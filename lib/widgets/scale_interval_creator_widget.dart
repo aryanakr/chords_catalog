@@ -25,12 +25,13 @@ class _ScaleIntervalCreatorWidgetState
   final _nameController = TextEditingController();
   late List<String> selectedNotes;
   late int rootIndex;
+  late List<String> sortedGridLabels;
 
   @override
   void initState() {
-    // TODO: implement initState
     selectedNotes = [widget.rootNote];
     rootIndex = MidiNote.sharpNoteLabels.indexOf(widget.rootNote);
+    sortedGridLabels = MidiNote.sharpNoteLabelsFromKey(widget.rootNote);
     super.initState();
   }
 
@@ -107,31 +108,19 @@ class _ScaleIntervalCreatorWidgetState
                 crossAxisSpacing: 6,
                 mainAxisSpacing: 0,
                 children: [
-                  for (int i = rootIndex;
-                      i < MidiNote.sharpNoteLabels.length;
+                  for (int i = 0;
+                      i < sortedGridLabels.length;
                       i++)
                     ElevatedButton(
                         onPressed: i == rootIndex
                             ? null
                             : () {
-                                _addNoteToScale(MidiNote.sharpNoteLabels[i]);
+                                _addNoteToScale(sortedGridLabels[i]);
                               },
-                        child: Text(MidiNote.sharpNoteLabels[i]),
+                        child: Text(sortedGridLabels[i]),
                         style: ElevatedButton.styleFrom(
                           primary: selectedNotes
-                                  .contains(MidiNote.sharpNoteLabels[i])
-                              ? Colors.amber
-                              : Colors.blue,
-                        )),
-                  for (int i = rootIndex - 1; i >= 0; i--)
-                    ElevatedButton(
-                        onPressed: () {
-                          _addNoteToScale(MidiNote.sharpNoteLabels[i]);
-                        },
-                        child: Text(MidiNote.sharpNoteLabels[i]),
-                        style: ElevatedButton.styleFrom(
-                          primary: selectedNotes
-                                  .contains(MidiNote.sharpNoteLabels[i])
+                                  .contains(sortedGridLabels[i])
                               ? Colors.amber
                               : Colors.blue,
                         ))

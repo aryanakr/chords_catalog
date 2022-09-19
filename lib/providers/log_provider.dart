@@ -15,10 +15,11 @@ class LogProvider extends ChangeNotifier {
 
   LogProvider({required this.name, required this.tuning, required this.sound, required this.scale, required this.chords});
 
-  void setLog(String name, Tuning tuning, InstrumentSound sound) {
+  void setLog(String name, Tuning tuning, InstrumentSound sound, LogScale scale) {
     this.name = name;
     this.tuning = tuning;
     this.sound = sound;
+    this.scale = scale;
   }
 
   void setLogScale(LogScale scale) {

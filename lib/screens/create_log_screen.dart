@@ -1,6 +1,7 @@
 import 'package:chords_catalog/models/instrument.dart';
 import 'package:chords_catalog/models/log_scale.dart';
 import 'package:chords_catalog/providers/log_provider.dart';
+import 'package:chords_catalog/screens/dashboard_screen.dart';
 import 'package:chords_catalog/screens/scale_configuration_screen.dart';
 import 'package:chords_catalog/widgets/instrument_configuration_widget.dart';
 import 'package:flutter/material.dart';
@@ -17,13 +18,14 @@ class CreateLogScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     void _onLogConfigSubmited(
-        String logName, Tuning tuning, InstrumentSound sound) {
+        String logName, Tuning tuning, InstrumentSound sound, LogScale scale) {
       // print('Got log name: $logName');
       // print('Got tuning with name: ${tuning.name}, pitches: ${tuning.openNotes.map((e) => e.label)}');
       // print('Got Sound ${sound.name}');
+      print('Got scale ${scale.base.name} with notes ${scale.notes}');
       Provider.of<LogProvider>(context, listen: false)
-          .setLog(logName, tuning, sound);
-      Navigator.of(context).pushNamed(ScaleConfigurationScreen.routeName);
+          .setLog(logName, tuning, sound, scale);
+      Navigator.of(context).pushNamed(DashboardScreen.routeName);
     }
 
     Map<int, List<Tuning>> _parseTuningList(Map<String, dynamic> data) {
