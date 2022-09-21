@@ -4,11 +4,13 @@ import 'package:chords_catalog/components/number_picker.dart';
 import 'package:chords_catalog/models/instrument.dart';
 import 'package:chords_catalog/models/log_scale.dart';
 import 'package:chords_catalog/models/note.dart';
+import 'package:chords_catalog/providers/sound_player_provider.dart';
 import 'package:chords_catalog/screens/scale_configuration_screen.dart';
 import 'package:chords_catalog/widgets/scale_configuration_widget.dart';
 import 'package:chords_catalog/widgets/scale_interval_creator_widget.dart';
 import 'package:chords_catalog/widgets/tuning_configuration_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class LogConfigurationWidget extends StatefulWidget {
   final void Function(String, Tuning, InstrumentSound, LogScale) submit;
@@ -75,24 +77,7 @@ class _LogConfigurationWidgetState extends State<LogConfigurationWidget> {
       scaleRoot = root;
       scaleBase = baseScale;
 
-      final allNotes = MidiNote.sharpNoteLabelsFromKey(scaleRoot);
-      print('allNotes: $allNotes');
-      final List<int> intervals = [];
-      intervals.addAll(scaleBase.intervals);
-      intervals.removeLast();
-
-      scaleNotes.clear();
-      scaleNotes.add(scaleRoot);
-
-      int index = 0;
-      for (int interval in intervals) {
-        index += interval;
-        final newNote = allNotes[index];
-        print('interval $interval adding  '+newNote);
-        scaleNotes.add(allNotes[index]);
-      }
-      
-      scale = LogScale(root: scaleRoot, notes: scaleNotes, base: baseScale);
+      scale = LogScale(root: scaleRoot, notes: baseScale.getNotes(scaleRoot), base: baseScale);
     });
   }
 
@@ -113,8 +98,24 @@ class _LogConfigurationWidgetState extends State<LogConfigurationWidget> {
     }
   }
 
+  void _playScaleDemo() {
+      final songPlayer = Provider.of<SoundPlayerProvider>(context, listen: false);
+
+      final sequece = scale.getDemoSequence();
+
+      print(sequece.notes.length);
+      //print scale notes
+      sequece.notes.forEach((element) {
+        print(element.notes[0].label);
+      });
+
+      songPlayer.setSound(instrumentSound);
+      songPlayer.startSequence(sequece);
+    }
+
   @override
   Widget build(BuildContext context) {
+
     return Container(
       margin: const EdgeInsets.all(20),
       child: Column(
@@ -152,12 +153,12 @@ class _LogConfigurationWidgetState extends State<LogConfigurationWidget> {
                     _setSound(selectedSound);
                   }
                 }),
-            IconButton(onPressed: (){}, icon: Icon(Icons.volume_down))
+            IconButton(onPressed: _playScaleDemo, icon: Icon(Icons.volume_down))
           ],),
           Expanded(child: Container(),),
           ElevatedButton(onPressed: () {
             _submitForm();
-          }, child: const Text('Next'))
+          }, child: const Text('Create Log'))
         ],
       ),
     );

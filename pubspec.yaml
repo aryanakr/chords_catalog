@@ -68,9 +68,9 @@ flutter:
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
   assets:
-   - assets/Perfect_Sine.sf2
+   - assets/PerfectSine.sf2
    - assets/Piano.sf2
-   - assets/Electric-Guitars.sf2
+   - assets/ElectricGuitars.sf2
    - assets/chords.csv
    - assets/tunings.json
    - assets/scales.csv

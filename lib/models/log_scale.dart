@@ -1,4 +1,5 @@
 import 'package:chords_catalog/models/chord.dart';
+import 'package:chords_catalog/models/midi_sequence.dart';
 import 'package:chords_catalog/models/note.dart';
 import 'package:csv/csv.dart';
 import 'package:flutter/services.dart';
@@ -29,7 +30,6 @@ class LogScale {
       final fifth = notes[(i+4)%notes.length];
 
       final tiradNotes = [root, third, fifth];
-      print('$i tiradd notes: $tiradNotes');
 
       for (List<dynamic> chordRow in lib) {
         final chord = Chord.createChordFromLibRow(chordRow);
@@ -42,6 +42,15 @@ class LogScale {
 
     }
     return triads;
+  }
+
+  MidiSequence getDemoSequence () {
+    List<SequenceNote> notes = [];
+    for (int i = 0 ; i<this.notes.length ; i++) {
+      final note = MidiNote.byLabel(label: this.notes[i]+"3");
+      notes.add(SequenceNote(notes: [note], weight: NoteWeight.quarter));
+    }
+    return MidiSequence(tempo: 60, notes: notes);
   }
 }
 
@@ -86,6 +95,8 @@ class BaseScale {
     final List<int> tmpIntervals = [];
     tmpIntervals.addAll(intervals);
     tmpIntervals.removeLast();
+
+    res.add(rootKey);
 
     int index = 0;
     for (int interval in tmpIntervals) {

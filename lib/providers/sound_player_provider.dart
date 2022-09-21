@@ -1,27 +1,95 @@
-import 'package:flutter/cupertino.dart';
-
-class SongPlayerProvider extends ChangeNotifier {
-  
-}
-
-/*
 import 'dart:async';
 import 'dart:math';
 
+import 'package:chords_catalog/models/instrument.dart';
+import 'package:chords_catalog/models/midi_sequence.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_midi/flutter_midi.dart';
-import 'package:guitar_tab_player/models/note.dart';
 
-
-class BarPlayerState extends ChangeNotifier {
-  final int tempo;
-  final int signature;
-
+class SoundPlayerProvider extends ChangeNotifier {
   final _flutterMidi = FlutterMidi();
 
   StreamSubscription? _subscription;
-  final List<TabNote> _barContent = [];
+
+  bool get isPlaying => _subscription != null && !_subscription!.isPaused;
+
+  int _playSequenceIndex = 0;
+  int _playRemainingWeight = 0;
+
+  SoundPlayerProvider() {
+    final defaultInstrument = InstrumentSound.DefaultSounds[0];
+    rootBundle.load(defaultInstrument.path).then((sf2) {
+      _flutterMidi.prepare(sf2: sf2, name: defaultInstrument.name);
+    });
+  }
+
+  void setSound(InstrumentSound sound) {
+    rootBundle.load(sound.path).then((sf2) {
+      _flutterMidi.prepare(sf2: sf2, name: sound.name);
+    });
+  }
+
+  void startSequence(MidiSequence sequence) {
+    _subscription?.cancel();
+
+    if (sequence.notes.isEmpty) {
+      return;
+    }
+
+    _playSequenceIndex = 0;
+    _playRemainingWeight = sequence.notes[0].weight.value;
+
+    _subscription = Stream.periodic(
+      Duration(milliseconds: sequence.baseDuration),
+    ).listen((value) => _playSequence(sequence));
+  }
+
+  void _playSequence(MidiSequence sequence) {
+
+    //print current remaining weight
+    print(_playRemainingWeight);
+    
+
+    if (_playRemainingWeight == sequence.notes[_playSequenceIndex].weight.value && sequence.notes[_playSequenceIndex].notes.isNotEmpty) {
+      for (var note in sequence.notes[_playSequenceIndex].notes) {
+        _flutterMidi.playMidiNote(midi: note.midiNumber);
+      }
+    }
+
+    _playRemainingWeight -= 1;
+    
+    if (_playRemainingWeight <= 0) {
+      _playSequenceIndex += 1;
+      if (_playSequenceIndex >= sequence.notes.length) {
+        if (sequence.loop) {
+          _playSequenceIndex = 0;
+        } else {
+          pause();
+          return;
+        }
+      }
+      _playRemainingWeight = sequence.notes[_playSequenceIndex].weight.value;
+    }
+
+    notifyListeners();
+  }
+
+  void pause() {
+    _subscription?.pause();
+    notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _subscription?.cancel();
+    super.dispose();
+  }
+}
+
+/*
+
+class BarPlayerState extends ChangeNotifier {
 
   var _currentSelectedWeight = NoteWeigth.half;
   var _playIndex = 0;
@@ -92,46 +160,7 @@ class BarPlayerState extends ChangeNotifier {
     notifyListeners();
   }
 
-  void play() {
-    _subscription?.cancel();
-
-    _subscription = Stream.periodic(
-      Duration(milliseconds: tempo),
-    ).listen((value) => playMidiNotes());
-  }
-
-  void playMidiNotes() {
-    var loop = true;
-    
-    if (_playRestCounter > 0) {
-      _playRestCounter -= 1;
-      
-      return;
-    }  
-    
-    if (_playIndex >= _barContent.length) {
-      _playIndex= 0;
-      if (!loop) {
-        pause();
-        reset();
-      }
-      return;
-    }
-
-    var waitTime = pow(2, 5-_barContent[_playIndex].weight.index) - 1;
-    _playRestCounter = waitTime.toInt();
-    var notes = _barContent[_playIndex].notes;
-
-    if (notes.isNotEmpty) {
-      for (var note in notes) {
-        print('hell2');
-        _flutterMidi.playMidiNote(midi: note.midi);
-      }
-    } 
-    _playIndex = (_playIndex + 1);
-
-    notifyListeners();
-  }
+  
 
   void playMidiNote(int note) {
     _flutterMidi.playMidiNote(midi: note);

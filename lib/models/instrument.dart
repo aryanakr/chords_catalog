@@ -10,8 +10,8 @@ class InstrumentSound {
   InstrumentSound({required this.path, required this.name});
 
   static List<InstrumentSound> DefaultSounds = [
-    InstrumentSound(path: 'assets/Electric-Guitars.sf2', name: 'Electric Guitar'),
-    InstrumentSound(path: 'assets/Perfect_Sine.sf2', name: 'Perfect Sine'),
+    InstrumentSound(path: 'assets/ElectricGuitars.sf2', name: 'ElectricGuitar'),
+    InstrumentSound(path: 'assets/PerfectSine.sf2', name: 'PerfectSine'),
     InstrumentSound(path: 'assets/Piano.sf2', name: 'Piano')
   ];
 }
@@ -40,6 +40,8 @@ class Tuning {
   }
 
   static Future<Map<String, dynamic>> loadLib() async {
+
+    // Load the JSON file from the "assets" folder
     final String response = await rootBundle.loadString('assets/tunings.json');
     final Map<String, dynamic> data = await json.decode(response);
 
