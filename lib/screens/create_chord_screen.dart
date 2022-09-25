@@ -12,6 +12,7 @@ import 'package:provider/provider.dart';
 
 class CreateChordScreen extends StatefulWidget {
   static const routeName = '/create-chord';
+
   const CreateChordScreen({Key? key}) : super(key: key);
 
   @override
@@ -25,28 +26,26 @@ class _CreateChordScreenState extends State<CreateChordScreen> {
   int startFret = 1;
 
   String selectedRootLabel = 'C';
-  Chord? selectedChordType = null;
-  int selectedChordIndex = -1;
+  Chord? selectedBaseChord = null;
+  String selectedChordType = '';
 
   void _setRootNote(String newLabel) {
     setState(() {
       selectedRootLabel = newLabel;
-      selectedChordType = null;
-      selectedChordIndex = -1;
+      selectedBaseChord = null;
+      selectedChordType = '';
 
       clearCard();
     });
   }
 
-  void _setChordType(Chord? newChord, int index) {
-
+  void _setChordType(Chord? newChord) {
     setState(() {
-      selectedChordType = newChord;
-      selectedChordIndex = index;
+      selectedBaseChord = newChord;
+      selectedChordType = newChord?.type ?? '';
 
       clearCard();
     });
-
   }
 
   void _setStartFret(int fret) {
@@ -54,19 +53,18 @@ class _CreateChordScreenState extends State<CreateChordScreen> {
       startFret = fret;
 
       // remove out of card notes and set the start fret
-        final fretDiff = fret - startFret;
-        for (int i = 0; i < chordCardNotes.length; i++) {
-            final t = chordCardNotes[i];
-            if (t != null && t != 0 && (t < fret || t-fret > 4)) {
-              chordCardNotes[i] = null;
-            }
-          }
+      final fretDiff = fret - startFret;
+      for (int i = 0; i < chordCardNotes.length; i++) {
+        final t = chordCardNotes[i];
+        if (t != null && t != 0 && (t < fret || t - fret > 4)) {
+          chordCardNotes[i] = null;
+        }
+      }
     });
   }
 
   void _submit(BuildContext context) {
-
-    if (selectedChordType == null) {
+    if (selectedBaseChord == null) {
       return;
     }
 
@@ -78,7 +76,12 @@ class _CreateChordScreenState extends State<CreateChordScreen> {
       }
     }
 
-    final guitarChord = GuitarChord(chord: selectedChordType!, name: _getChordName(), cardDotsPos: chordCardNotes, startFret: startFret, midiNotes: midiNotes);
+    final guitarChord = GuitarChord(
+        chord: selectedBaseChord!,
+        name: _getChordName(),
+        cardDotsPos: chordCardNotes,
+        startFret: startFret,
+        midiNotes: midiNotes);
     Provider.of<LogProvider>(context, listen: false).addChord(guitarChord);
 
     Navigator.of(context).pushReplacementNamed(DashboardScreen.routeName);
@@ -86,7 +89,9 @@ class _CreateChordScreenState extends State<CreateChordScreen> {
 
   bool addNote(MidiNote note, int string, int fret) {
     setState(() {
-      if (chordNotes[string] != null && chordNotes[string]!.midiNumber == note.midiNumber && chordCardNotes[string] == fret ) {
+      if (chordNotes[string] != null &&
+          chordNotes[string]!.midiNumber == note.midiNumber &&
+          chordCardNotes[string] == fret) {
         chordNotes[string] = null;
         chordCardNotes[string] = null;
       } else {
@@ -99,11 +104,11 @@ class _CreateChordScreenState extends State<CreateChordScreen> {
   }
 
   String _getChordName() {
-    if (selectedChordType == null) {
+    if (selectedBaseChord == null) {
       return "Select Chord Type";
     }
 
-    return selectedChordType!.root + selectedChordType!.type;
+    return selectedBaseChord!.root + selectedBaseChord!.type;
   }
 
   void clearCard() {
@@ -115,6 +120,8 @@ class _CreateChordScreenState extends State<CreateChordScreen> {
 
   @override
   void initState() {
+    super.initState();
+
     numStrings = Provider.of<LogProvider>(context, listen: false)
         .tuning!
         .openNotes
@@ -122,11 +129,29 @@ class _CreateChordScreenState extends State<CreateChordScreen> {
     chordNotes = [for (int i = 0; i < numStrings; i++) null];
     chordCardNotes = [for (int i = 0; i < numStrings; i++) null];
 
-    selectedRootLabel = Provider.of<LogProvider>(context, listen: false).scale!.root;
+    selectedRootLabel =
+        Provider.of<LogProvider>(context, listen: false).scale!.root;
+    
   }
 
   @override
   Widget build(BuildContext context) {
+
+    final args = ModalRoute.of(context)!.settings.arguments as CreateChordArgs;
+    final chord = args.chord;
+    if (chord != null) {
+
+      numStrings = chord.cardDotsPos.length;
+      chordNotes = chord.midiNotes.isEmpty ? [for (int i = 0; i < numStrings; i++) null] : chord.midiNotes;
+      chordCardNotes = chord.cardDotsPos;
+      startFret = chord.startFret;
+      selectedRootLabel = chord.chord.root;
+      selectedBaseChord = chord.chord;
+      selectedChordType = chord.chord.type;
+
+    }
+    
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Create Chord'),
@@ -139,7 +164,11 @@ class _CreateChordScreenState extends State<CreateChordScreen> {
           SizedBox(
             height: 10,
           ),
-          ChordCardWidget(name: _getChordName(), numStrings: numStrings, startFret: startFret, notes: GuitarChord.toDrawCardDotsPos(chordCardNotes, startFret)),
+          ChordCardWidget(
+              name: _getChordName(),
+              numStrings: numStrings,
+              startFret: startFret,
+              notes: GuitarChord.toDrawCardDotsPos(chordCardNotes, startFret)),
           SizedBox(
             height: 10,
           ),
@@ -148,7 +177,10 @@ class _CreateChordScreenState extends State<CreateChordScreen> {
               Text('Key:'),
               DropdownButton(
                   items: [
-                    for (String noteLabel in Provider.of<LogProvider>(context, listen: false).scale!.notes)
+                    for (String noteLabel
+                        in Provider.of<LogProvider>(context, listen: false)
+                            .scale!
+                            .notes)
                       DropdownMenuItem(
                         child: Text(noteLabel),
                         value: noteLabel,
@@ -169,11 +201,14 @@ class _CreateChordScreenState extends State<CreateChordScreen> {
 
                   final List<List<dynamic>> dataFiltered = [];
 
-                  final scale = Provider.of<LogProvider>(context, listen: false).scale!.notes;
+                  final scale = Provider.of<LogProvider>(context, listen: false)
+                      .scale!
+                      .notes;
 
                   for (List<dynamic> row in data) {
                     final rowNotes = row[3].toString().split(',');
-                    if (row[0].toString() == selectedRootLabel && !rowNotes.any((element) => !scale.contains(element))) {
+                    if (row[0].toString() == selectedRootLabel &&
+                        !rowNotes.any((element) => !scale.contains(element))) {
                       dataFiltered.add(row);
                     }
                   }
@@ -183,24 +218,26 @@ class _CreateChordScreenState extends State<CreateChordScreen> {
                       Text('Type:'),
                       DropdownButton(
                           items: [
-                            DropdownMenuItem(
+                            const DropdownMenuItem(
                               child: Text('Select'),
-                              value: -1,
+                              value: '',
                             ),
                             for (int i = 0; i < dataFiltered.length; i++)
                               DropdownMenuItem(
                                 child: Text(dataFiltered[i][1].toString()),
-                                value: i,
+                                value: dataFiltered[i][1].toString(),
                               ),
                           ],
-                          value: selectedChordIndex,
-                          onChanged: (int? index) {
-                            if (index != null  && index >= 0){
-                              Chord newChord = Chord.createChordFromLibRow(dataFiltered[index]);
-                              _setChordType(newChord, index);
-                            }
-                            else {
-                              _setChordType(null, -1);
+                          value: selectedChordType,
+                          onChanged: (String? selected) {
+                            if (selected != null && selected.isNotEmpty) {
+                              final selectedChord = dataFiltered.firstWhere(
+                                  (element) => element[1] == selected);
+                              Chord newChord = Chord.createChordFromLibRow(
+                                  selectedChord);
+                              _setChordType(newChord);
+                            } else {
+                              _setChordType(null);
                             }
                           }),
                     ],
@@ -208,21 +245,30 @@ class _CreateChordScreenState extends State<CreateChordScreen> {
                 }
                 return Container();
               })),
-          
           Row(
             children: [
               Text('Starting fret'),
-              NumberPicker(min: 1, max: 19, value: startFret, update: _setStartFret),
+              NumberPicker(
+                  min: 1, max: 19, value: startFret, update: _setStartFret),
             ],
           ),
           Expanded(child: Container()),
           FretboardWidget(
-            addNote: addNote,
-            startFret: startFret,
-            enabledNotes: selectedChordType == null ? Provider.of<LogProvider>(context, listen: false).scale!.notes : selectedChordType!.noteLabels
-          )
+              addNote: addNote,
+              startFret: startFret,
+              enabledNotes: selectedBaseChord == null
+                  ? Provider.of<LogProvider>(context, listen: false)
+                      .scale!
+                      .notes
+                  : selectedBaseChord!.noteLabels)
         ],
       ),
     );
   }
+}
+
+class CreateChordArgs {
+  final GuitarChord? chord;
+
+  CreateChordArgs({this.chord});
 }

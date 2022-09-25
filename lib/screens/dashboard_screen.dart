@@ -18,7 +18,7 @@ class DashboardScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     void _createNewChord() {
-      Navigator.of(context).pushNamed(CreateChordScreen.routeName);
+      Navigator.of(context).pushNamed(CreateChordScreen.routeName, arguments: CreateChordArgs(chord: null));
     }
 
     
@@ -35,7 +35,7 @@ class DashboardScreen extends StatelessWidget {
             child: Column(children: [
               SuggestionTriadsWidget(scale: scale),
               SizedBox(height: 16,),
-              ElevatedButton(onPressed: _createNewChord, child: const Text('Add new Chord'))
+              ElevatedButton(onPressed: () => _createNewChord(), child: const Text('Add new Chord'))
             ],),
           ),
         ),

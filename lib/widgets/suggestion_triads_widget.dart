@@ -13,23 +13,17 @@ class SuggestionTriadsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-        future: scale.getTriads(),
-        builder: ((context, snapshot) {
-          if (!snapshot.hasData) {
-            return Center(child: CircularProgressIndicator());
-          }
-
-          List<Triad> chords = snapshot.data! as List<Triad>;
-
-          return SizedBox(
-            child: StaggeredGrid.count(crossAxisCount: 3, children: [
-              for (var chord in chords)
-                TriadChordWidget(
-                  triad: chord,
-                )
-            ],),
-          );
-        }));
+    final triads = scale.getTriads();
+    return SizedBox(
+      child: StaggeredGrid.count(
+        crossAxisCount: 3,
+        children: [
+          for (var chord in triads)
+            TriadChordWidget(
+              triad: chord,
+            )
+        ],
+      ),
+    );
   }
 }

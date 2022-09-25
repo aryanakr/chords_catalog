@@ -20,24 +20,67 @@ class LogScale {
     return data;
   }
 
-  Future<List<Triad>> getTriads () async {
+  List<Triad> getTriads () {
 
-    final lib = await Chord.loadLib();
     List<Triad> triads = [];
+
     for (int i = 0 ; i<notes.length ; i++) {
       final root = notes[i];
-      final third = notes[(i+2)%notes.length];
-      final fifth = notes[(i+4)%notes.length];
+      final allNotes = MidiNote.sharpNoteLabelsFromKey(root);
 
-      final tiradNotes = [root, third, fifth];
+      // check major
+      String third = allNotes[4];
+      String fifth = allNotes[7];
+      if (notes.contains(third) && notes.contains(fifth)){
+        final chord = Chord(root: root, type: 'maj', structure: '1,3,5', noteLabels: [root, third, fifth]);
+        triads.add(Triad(chord: chord, romanNumber: Triad.getNumberLabel(i+1)));
+        continue;
+      }
 
-      for (List<dynamic> chordRow in lib) {
-        final chord = Chord.createChordFromLibRow(chordRow);
-        //if (chord.noteLabels.length == 3 && chord.noteLabels.every((element) => tiradNotes.contains(element)))
-        if (chord.noteLabels.length == 3 && chord.noteLabels[0] == root && chord.noteLabels[1] == third && chord.noteLabels[2] == fifth) {
-          chord.noteLabels = tiradNotes;
-          triads.add(Triad(chord: chord, number: i+1));
-        }
+      // check minor
+      third = allNotes[3];
+      fifth = allNotes[7];
+      if (notes.contains(third) && notes.contains(fifth)){
+        final chord = Chord(root: root, type: 'm', structure: '1,b3,5', noteLabels: [root, third, fifth]);
+        triads.add(Triad(chord: chord, romanNumber: Triad.getNumberLabel(i+1).toLowerCase()));
+        continue;
+      }
+      
+
+      // check diminished
+      third = allNotes[3];
+      fifth = allNotes[6];
+      if (notes.contains(third) && notes.contains(fifth)){
+        final chord = Chord(root: root, type: 'dim', structure: '1,b3,b5', noteLabels: [root, third, fifth]);
+        triads.add(Triad(chord: chord, romanNumber: Triad.getNumberLabel(i+1).toLowerCase() + "°"));
+        continue;
+      }
+
+      // check augmented
+      third = allNotes[4];
+      fifth = allNotes[8];
+      if (notes.contains(third) && notes.contains(fifth)){
+        final chord = Chord(root: root, type: 'aug', structure: '1,3,#5', noteLabels: [root, third, fifth]);
+        triads.add(Triad(chord: chord, romanNumber: Triad.getNumberLabel(i+1).toLowerCase() + "+"));
+        continue;
+      }
+
+      // check sus2
+      third = allNotes[2];
+      fifth = allNotes[5];
+      if (notes.contains(third) && notes.contains(fifth)){
+        final chord = Chord(root: root, type: 'sus2', structure: '1,2,5', noteLabels: [root, third, fifth]);
+        triads.add(Triad(chord: chord, romanNumber: Triad.getNumberLabel(i+1).toLowerCase() + "sus2"));
+        continue;
+      }
+
+      // check sus4
+      third = allNotes[5];
+      fifth = allNotes[2];
+      if (notes.contains(third) && notes.contains(fifth)){
+        final chord = Chord(root: root, type: 'sus4', structure: '1,4,5', noteLabels: [root, third, fifth]);
+        triads.add(Triad(chord: chord, romanNumber: Triad.getNumberLabel(i+1).toLowerCase() + "sus4"));
+        continue;
       }
 
     }
@@ -55,10 +98,10 @@ class LogScale {
 }
 
 class Triad extends Chord {
-  final int number;
-  Triad({required Chord chord, required this.number}) : super(root: chord.root, type: chord.type, structure: chord.structure, noteLabels: chord.noteLabels);
+  final String romanNumber;
+  Triad({required Chord chord, required this.romanNumber}) : super(root: chord.root, type: chord.type, structure: chord.structure, noteLabels: chord.noteLabels);
   
-  String getNumberLabel () {
+  static String getNumberLabel (int number) {
     switch (number) {
       case 1:
         return "I";
