@@ -31,6 +31,7 @@ class _ScaleConfigurationWidgetState extends State<ScaleConfigurationWidget> {
   }
 
   Dialog createIntervalConfigDialog() {
+    print(widget.root);
     return Dialog(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),

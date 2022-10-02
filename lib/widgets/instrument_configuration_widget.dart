@@ -93,7 +93,14 @@ class _LogConfigurationWidgetState extends State<LogConfigurationWidget> {
     }
     else if (tuning.openNotes.any((element) => element == null)) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Please fill all the tuning pitches!')));
-    } else {
+    }
+    else if (tuning.isCustomTuning && tuning.name.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Please set a name for your custom tuning!')));
+    }
+    else if (scale.base.isCustomScale && scale.base.name.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Please set a name for your custom scale!')));
+    }
+    else {
       widget.submit(_nameController.text, tuning, instrumentSound, scale);
     }
   }
@@ -125,11 +132,17 @@ class _LogConfigurationWidgetState extends State<LogConfigurationWidget> {
                 controller: _nameController,
               ),
           const SizedBox(height: 32,),
-          Row(mainAxisAlignment: MainAxisAlignment.spaceAround ,children: [
-            const Text('Number of Strings', style: TextStyle(fontSize: 18),),
-            NumberPicker(value: stringsNumber, update: _setStringNumber, min: 1, buttonsAxis: Axis.horizontal, showArrowIcons: false,)
+          Row(children: const [
+            Text('Number of Strings', style: TextStyle(fontSize: 18),),
           ],),
-          const SizedBox(height: 32,),
+          const SizedBox(height: 24,),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              NumberPicker(value: stringsNumber, update: _setStringNumber, min: 1, buttonsAxis: Axis.horizontal, showArrowIcons: false,),
+            ],
+          ),
+          const SizedBox(height: 24,),
           TuningConfigurationWidget(
             update: _setTuning, 
             currentTuning: tuning, 

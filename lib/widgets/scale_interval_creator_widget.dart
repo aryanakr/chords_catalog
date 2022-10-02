@@ -32,6 +32,14 @@ class _ScaleIntervalCreatorWidgetState
     selectedNotes = [widget.rootNote];
     rootIndex = MidiNote.sharpNoteLabels.indexOf(widget.rootNote);
     sortedGridLabels = MidiNote.sharpNoteLabelsFromKey(widget.rootNote);
+    _nameController.text = widget.currentScale.name;
+
+    int index = 0;
+    for (int i = 0; i < widget.currentScale.intervals.length - 1; i++) {
+      final interval = widget.currentScale.intervals[i];
+      index += interval;
+      selectedNotes.add(sortedGridLabels[index]);
+    }
     super.initState();
   }
 
@@ -46,19 +54,19 @@ class _ScaleIntervalCreatorWidgetState
     });
   }
 
-  void _submit () {
+  void _submit() {
     List<int> intervals = [];
     final notesList = MidiNote.sharpNoteLabelsFromKey(widget.rootNote);
 
     int index = 1;
     String lastNote = widget.rootNote;
-    for (int i = 1 ; i<notesList.length ; i++) {
+    for (int i = 1; i < notesList.length; i++) {
       if (selectedNotes.contains(notesList[i])) {
         intervals.add(index);
         lastNote = notesList[i];
         index = 1;
       } else {
-        index ++;
+        index++;
       }
     }
 
@@ -67,15 +75,17 @@ class _ScaleIntervalCreatorWidgetState
     if (lastNoteInterval == 0) {
       lastNoteInterval = 12;
     }
-    
+
     intervals.add(lastNoteInterval);
 
     setState(() {
-      final resBaseScale = BaseScale(name: _nameController.text, intervals: intervals, isCustomScale: true);
+      final resBaseScale = BaseScale(
+          name: _nameController.text,
+          intervals: intervals,
+          isCustomScale: true);
       widget.submit(resBaseScale);
       Navigator.of(context).pop();
     });
-
   }
 
   @override
@@ -92,8 +102,14 @@ class _ScaleIntervalCreatorWidgetState
             SizedBox(
               height: 16,
             ),
-            TextField(decoration: const InputDecoration(labelText: 'Name', hintText: 'New Scale'), controller: _nameController,),
-            SizedBox(height: 16,),
+            TextField(
+              decoration: const InputDecoration(
+                  labelText: 'Name', hintText: 'New Scale'),
+              controller: _nameController,
+            ),
+            SizedBox(
+              height: 16,
+            ),
             CustomPaint(
               size: Size(MediaQuery.of(context).size.width - 50, 70),
               painter: ScaleIntervalStripPainter(
@@ -108,21 +124,18 @@ class _ScaleIntervalCreatorWidgetState
                 crossAxisSpacing: 6,
                 mainAxisSpacing: 0,
                 children: [
-                  for (int i = 0;
-                      i < sortedGridLabels.length;
-                      i++)
+                  for (int i = 0; i < sortedGridLabels.length; i++)
                     ElevatedButton(
-                        onPressed: i == rootIndex
+                        onPressed: i == 0
                             ? null
                             : () {
                                 _addNoteToScale(sortedGridLabels[i]);
                               },
                         child: Text(sortedGridLabels[i]),
                         style: ElevatedButton.styleFrom(
-                          primary: selectedNotes
-                                  .contains(sortedGridLabels[i])
+                          primary: selectedNotes.contains(sortedGridLabels[i])
                               ? Colors.amber
-                              : Colors.blue,
+                              : ChordLogColors.primary,
                         ))
                 ],
               ),
@@ -132,12 +145,19 @@ class _ScaleIntervalCreatorWidgetState
             ),
             Row(
               children: [
-                ElevatedButton(
-                    onPressed: _submit,
-                    child: Text('Submit')),
-                widget.currentScale.isCustomScale ? TextButton(onPressed: (){widget.submit(null);
-                Navigator.of(context).pop();
-                }, child: Text('Discard')) : TextButton(onPressed: (){Navigator.of(context).pop();}, child: Text('Cancel'))
+                ElevatedButton(onPressed: _submit, child: Text('Submit')),
+                widget.currentScale.isCustomScale
+                    ? TextButton(
+                        onPressed: () {
+                          widget.submit(null);
+                          Navigator.of(context).pop();
+                        },
+                        child: Text('Discard'))
+                    : TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: Text('Cancel'))
               ],
             )
           ],
