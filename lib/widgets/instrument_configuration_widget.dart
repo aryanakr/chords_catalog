@@ -117,18 +117,19 @@ class _LogConfigurationWidgetState extends State<LogConfigurationWidget> {
   Widget build(BuildContext context) {
 
     return Container(
-      margin: const EdgeInsets.all(20),
+      margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
       child: Column(
         children: [
           TextField(
                 decoration: const InputDecoration(labelText: 'Log Name', hintText: 'New Log'),
                 controller: _nameController,
               ),
-          const SizedBox(height: 8,),
-          Row(children: [
-            const Text('Strings', style: TextStyle(fontSize: 18),),
-            NumberPicker(value: stringsNumber, update: _setStringNumber, min: 1)
+          const SizedBox(height: 32,),
+          Row(mainAxisAlignment: MainAxisAlignment.spaceAround ,children: [
+            const Text('Number of Strings', style: TextStyle(fontSize: 18),),
+            NumberPicker(value: stringsNumber, update: _setStringNumber, min: 1, buttonsAxis: Axis.horizontal, showArrowIcons: false,)
           ],),
+          const SizedBox(height: 32,),
           TuningConfigurationWidget(
             update: _setTuning, 
             currentTuning: tuning, 
@@ -153,12 +154,15 @@ class _LogConfigurationWidgetState extends State<LogConfigurationWidget> {
                     _setSound(selectedSound);
                   }
                 }),
-            IconButton(onPressed: _playScaleDemo, icon: Icon(Icons.volume_down))
+            TextButton(onPressed: _playScaleDemo, child: Icon(Icons.volume_up))
           ],),
-          Expanded(child: Container(),),
-          ElevatedButton(onPressed: () {
-            _submitForm();
-          }, child: const Text('Create Log'))
+          const SizedBox(height: 32),
+          SizedBox(
+            width: MediaQuery.of(context).size.width * 0.5,
+            child: ElevatedButton(onPressed: () {
+              _submitForm();
+            }, child: const Text('Create Log')),
+          )
         ],
       ),
     );

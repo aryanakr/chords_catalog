@@ -2,6 +2,7 @@
 
 import 'package:chords_catalog/models/note.dart';
 import 'package:csv/csv.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class Chord {
@@ -38,7 +39,8 @@ class GuitarChord {
   final List<int?> cardDotsPos;
   final String name;
   final int startFret;
-  final List<MidiNote> midiNotes;
+  final List<MidiNote?> midiNotes;
+  final Color cardColor;
 
   List<int?> drawCardDotsPos() {
 
@@ -49,5 +51,5 @@ class GuitarChord {
     return notes.map((e) => e == null || e == 0 ? e : e - startFret + 1).toList();
   }
 
-  GuitarChord({required this.chord, required this.name, required this.cardDotsPos, required this.startFret, required this.midiNotes});
+  GuitarChord({required this.chord, required this.name, required this.cardDotsPos, required this.startFret, required this.midiNotes, required this.cardColor});
 }

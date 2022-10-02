@@ -40,6 +40,8 @@ dependencies:
   csv: ^5.0.1
   flutter_staggered_grid_view: ^0.6.2
   flutter_picker: ^2.0.5
+  flutter_colorpicker: ^1.0.3
+  random_color: ^1.0.6-nullsafety
 
 dev_dependencies:
   flutter_test:
@@ -75,6 +77,7 @@ flutter:
    - assets/tunings.json
    - assets/scales.csv
 
+
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
 
@@ -92,6 +95,9 @@ flutter:
       fonts:
         - asset: fonts/GreatVibes-Regular.ttf
           weight: 400
+    - family:  ChordLogCustomIcons
+      fonts:
+        - asset: fonts/ChordLogCustomIcons.ttf
   # fonts:
   #   - family: Schyler
   #     fonts:

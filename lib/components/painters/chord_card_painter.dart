@@ -58,7 +58,7 @@ class ChordCardPainter extends CustomPainter {
     }
 
     // draw fret lines
-    int numFrets = 6;
+    int numFrets = 7;
     double fretsPadding = (size.width - 2 * framePaddingVertical) / (numFrets - 1);
 
     for (int i = 1 ; i < numFrets - 1; i++) {
@@ -67,7 +67,7 @@ class ChordCardPainter extends CustomPainter {
     }
 
     // draw notes
-    double noteCirclesRadius = 10;
+    double noteCirclesRadius = size.width/25;
 
     
 
@@ -75,10 +75,10 @@ class ChordCardPainter extends CustomPainter {
       double dx = framePaddingHorizental + stringsPadding * i;
       final note = notes [i];
       if (note == null){
-        drawCross(canvas, Offset(dx, noteCirclesRadius), noteCirclesRadius, strockPaint);
+        drawCross(canvas, Offset(dx, noteCirclesRadius+7), noteCirclesRadius, strockPaint);
       }
       else if (note == 0) {
-        canvas.drawCircle(Offset(dx, noteCirclesRadius), noteCirclesRadius, strockPaint);
+        canvas.drawCircle(Offset(dx, noteCirclesRadius+7), noteCirclesRadius, strockPaint);
       } else {
         double dy = framePaddingVertical + (note * fretsPadding) - fretsPadding/2;
         canvas.drawCircle(Offset(dx, dy), noteCirclesRadius, paint);

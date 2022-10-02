@@ -15,18 +15,20 @@ class FretboardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final openNotes = Provider.of<LogProvider>(context).tuning!.openNotes;
     return Container(
+      height: (openNotes.length) * 30.0 + 20,
       color: Colors.amber,
-      height: 150,
       child: ListView.separated(
           scrollDirection: Axis.horizontal,
           itemBuilder: (BuildContext context, int index) {
-            var notes = Provider.of<LogProvider>(context).tuning!.openNotes.reversed.map((e) => MidiNote.byMidiNumber(midiNumber: e!.midiNumber + index)).toList();
+            var notes = openNotes.reversed.map((e) => MidiNote.byMidiNumber(midiNumber: e!.midiNumber + index)).toList();
             return Container(
-                color: Colors.red,
+                color: Colors.black87,
                 child: FretboardFret(
                   notes: notes,
-                  triggerNote: (index != 0 && (index < startFret || index - startFret >= 5)) ? null : (int stringIndex, MidiNote note) {
+                  index: index,
+                  triggerNote: (index != 0 && (index < startFret || index - startFret >= 6)) ? null : (int stringIndex, MidiNote note) {
                     addNote(note, stringIndex, index);
                   },
                   enabledNotes: enabledNotes,
@@ -35,7 +37,7 @@ class FretboardWidget extends StatelessWidget {
           separatorBuilder: (BuildContext context, int index) {
             return const Divider();
           },
-          itemCount: 24),
+          itemCount: 25),
     );
   }
 }

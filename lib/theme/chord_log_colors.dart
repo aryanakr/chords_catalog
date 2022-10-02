@@ -1,11 +1,10 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
 
 
 class ChordLogColors {
   static const primary = Color(0xFFEA8058);
   static const secondary = Color(0xFFFFEFBB);
+  static const bodyColor =  Color(0xFFFF9E30);
 
   static const Map<int, Color> _primaryMap = {
     50:Color.fromRGBO(234, 128, 88, 0.1),
@@ -37,12 +36,22 @@ class ChordLogColors {
   static const materialSecondary = MaterialColor(0xFFFFEFBB, _secondaryMap);
 
   static const backGroundGradient = LinearGradient(
-              begin: Alignment.topRight,
-              end: Alignment.bottomLeft,
+              begin: Alignment.topCenter,
+              end: Alignment.bottomRight,
+              stops: [0.2, 0.8],
               colors: [
+                bodyColor,
                 secondary,
-                Color.fromARGB(255, 253, 150, 33),
               ],
             );
+
+  static const mainBackgroundColor = LinearGradient(
+    begin: Alignment.topRight,
+    end: Alignment.bottomLeft,
+    colors: [
+      secondary,
+      Color.fromARGB(255, 253, 150, 33),
+    ],
+  );
 }
  

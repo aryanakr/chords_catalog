@@ -6,9 +6,14 @@ import 'package:chords_catalog/providers/log_provider.dart';
 import 'package:chords_catalog/screens/chord_view_screen.dart';
 import 'package:chords_catalog/screens/dashboard_screen.dart';
 import 'package:chords_catalog/widgets/chord_card_widget.dart';
+import 'package:chords_catalog/widgets/create_chord_controls_widget.dart';
 import 'package:chords_catalog/widgets/fretboard_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:provider/provider.dart';
+import 'package:random_color/random_color.dart';
+
+import '../theme/chord_log_colors.dart';
 
 class CreateChordScreen extends StatefulWidget {
   static const routeName = '/create-chord';
@@ -39,12 +44,13 @@ class _CreateChordScreenState extends State<CreateChordScreen> {
     });
   }
 
-  void _setChordType(Chord? newChord) {
+  void _setChordType({Chord? newChord, bool keepNotes = false}) {
     setState(() {
       selectedBaseChord = newChord;
       selectedChordType = newChord?.type ?? '';
-
-      clearCard();
+      if (!keepNotes) {
+        clearCard();
+      }
     });
   }
 
@@ -63,17 +69,16 @@ class _CreateChordScreenState extends State<CreateChordScreen> {
     });
   }
 
+  bool isFretboardVisibile = true;
+  void _setFretboardVisibility(bool state) {
+    setState(() {
+      isFretboardVisibile = state;
+    });
+  }
+
   void _submit(BuildContext context) {
     if (selectedBaseChord == null) {
       return;
-    }
-
-    final List<MidiNote> midiNotes = [];
-
-    for (MidiNote? m in chordNotes) {
-      if (m != null) {
-        midiNotes.add(m);
-      }
     }
 
     final guitarChord = GuitarChord(
@@ -81,14 +86,18 @@ class _CreateChordScreenState extends State<CreateChordScreen> {
         name: _getChordName(),
         cardDotsPos: chordCardNotes,
         startFret: startFret,
-        midiNotes: midiNotes);
-    Provider.of<LogProvider>(context, listen: false).addChord(guitarChord);
+        midiNotes: chordNotes,
+        cardColor: currentColor);
+    Provider.of<LogProvider>(context, listen: false)
+        .saveChord(chord: guitarChord, index: logIndex);
 
-    Navigator.of(context).pushReplacementNamed(DashboardScreen.routeName);
+    Navigator.of(context)
+        .pushNamedAndRemoveUntil(DashboardScreen.routeName, (route) => false);
   }
 
   bool addNote(MidiNote note, int string, int fret) {
     setState(() {
+      hasSuggested = false;
       if (chordNotes[string] != null &&
           chordNotes[string]!.midiNumber == note.midiNumber &&
           chordCardNotes[string] == fret) {
@@ -118,6 +127,44 @@ class _CreateChordScreenState extends State<CreateChordScreen> {
     startFret = 1;
   }
 
+  Future<void> suggestChord() async {
+    setState(() {
+      hasSuggested = true;
+    });
+
+    final lib = await Chord.loadLib();
+
+    final List<String> notNullChordNotes = [];
+    for (int i = 0; i < chordNotes.length; i++) {
+      if (chordNotes[i] != null) {
+        notNullChordNotes.add(chordNotes[i]!.getNoteLabel());
+      }
+    }
+
+    Chord? suggestion = null;
+
+    for (List<dynamic> row in lib) {
+      final chord = Chord.createChordFromLibRow(row);
+
+      if (chord.root == selectedRootLabel &&
+          !chord.noteLabels
+              .any((element) => !notNullChordNotes.contains(element))) {
+        suggestion = chord;
+        break;
+      }
+    }
+
+    if (suggestion != null) {
+      _setChordType(newChord: suggestion, keepNotes: true);
+    }
+  }
+
+  void setChordTypeDef(Chord? chord) {
+    _setChordType(newChord: chord);
+  }
+
+  bool hasSuggested = false;
+
   @override
   void initState() {
     super.initState();
@@ -131,137 +178,236 @@ class _CreateChordScreenState extends State<CreateChordScreen> {
 
     selectedRootLabel =
         Provider.of<LogProvider>(context, listen: false).scale!.root;
-    
+  }
+
+  bool hasInit = false;
+  GuitarChord? initialChord = null;
+  int logIndex = -1;
+
+  Color pickerColor = Colors.white;
+  Color currentColor = Colors.white;
+
+  void changeColor(Color color) {
+    setState(() => pickerColor = color);
+  }
+
+  void showColorPicker() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Pick color for card!'),
+          content: SingleChildScrollView(
+            child: ColorPicker(
+              pickerColor: pickerColor,
+              onColorChanged: changeColor,
+              showLabel: true,
+              pickerAreaHeightPercent: 0.8,
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Set Color'),
+              onPressed: () {
+                setState(() => currentColor = pickerColor);
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-
     final args = ModalRoute.of(context)!.settings.arguments as CreateChordArgs;
     final chord = args.chord;
-    if (chord != null) {
+    if (!hasInit) {
+      if (chord != null) {
+        numStrings = chord.cardDotsPos.length;
+        chordNotes = chord.midiNotes.isEmpty
+            ? [for (int i = 0; i < numStrings; i++) null]
+            : chord.midiNotes;
+        chordCardNotes = chord.cardDotsPos;
+        startFret = chord.startFret;
+        selectedRootLabel = chord.chord.root;
+        selectedBaseChord = chord.chord;
+        selectedChordType = chord.chord.type;
+        currentColor = chord.cardColor;
+        pickerColor = currentColor;
+        logIndex = args.logIndex;
 
-      numStrings = chord.cardDotsPos.length;
-      chordNotes = chord.midiNotes.isEmpty ? [for (int i = 0; i < numStrings; i++) null] : chord.midiNotes;
-      chordCardNotes = chord.cardDotsPos;
-      startFret = chord.startFret;
-      selectedRootLabel = chord.chord.root;
-      selectedBaseChord = chord.chord;
-      selectedChordType = chord.chord.type;
-
+        initialChord = chord;
+      } else {
+        pickerColor = RandomColor().randomColor(
+            colorBrightness: ColorBrightness.veryLight,
+            colorSaturation: ColorSaturation.mediumSaturation);
+        currentColor = pickerColor;
+      }
+      hasInit = true;
     }
-    
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Create Chord'),
-        actions: [
-          IconButton(onPressed: () => _submit(context), icon: Icon(Icons.check))
-        ],
-      ),
-      body: Column(
-        children: [
-          SizedBox(
-            height: 10,
-          ),
-          ChordCardWidget(
-              name: _getChordName(),
-              numStrings: numStrings,
-              startFret: startFret,
-              notes: GuitarChord.toDrawCardDotsPos(chordCardNotes, startFret)),
-          SizedBox(
-            height: 10,
-          ),
-          Row(
-            children: [
-              Text('Key:'),
-              DropdownButton(
-                  items: [
-                    for (String noteLabel
-                        in Provider.of<LogProvider>(context, listen: false)
-                            .scale!
-                            .notes)
-                      DropdownMenuItem(
-                        child: Text(noteLabel),
-                        value: noteLabel,
-                      ),
-                  ],
-                  value: selectedRootLabel,
-                  onChanged: (String? s) {
-                    if (s != null) _setRootNote(s);
-                  }),
+      body: NestedScrollView(
+        headerSliverBuilder: (context, innerBoxIsScrolled) => [
+          SliverAppBar(
+            title: Text('Create Chord'),
+            backgroundColor: ChordLogColors.bodyColor,
+            actions: [
+              IconButton(
+                  onPressed: () => _submit(context), icon: Icon(Icons.check))
             ],
-          ),
-          FutureBuilder(
-              future: Chord.loadLib(),
-              builder: ((context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.done &&
-                    snapshot.data != null) {
-                  final data = snapshot.data as List<List<dynamic>>;
-
-                  final List<List<dynamic>> dataFiltered = [];
-
-                  final scale = Provider.of<LogProvider>(context, listen: false)
-                      .scale!
-                      .notes;
-
-                  for (List<dynamic> row in data) {
-                    final rowNotes = row[3].toString().split(',');
-                    if (row[0].toString() == selectedRootLabel &&
-                        !rowNotes.any((element) => !scale.contains(element))) {
-                      dataFiltered.add(row);
-                    }
-                  }
-
-                  return Row(
-                    children: [
-                      Text('Type:'),
-                      DropdownButton(
-                          items: [
-                            const DropdownMenuItem(
-                              child: Text('Select'),
-                              value: '',
+          )
+        ],
+        body: Container(
+          decoration:
+              const BoxDecoration(gradient: ChordLogColors.backGroundGradient),
+          child: Stack(children: [
+            Container(
+              height: MediaQuery.of(context).size.height,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(38),
+                  topRight: Radius.circular(38),
+                ),
+              ),
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    SizedBox(
+                      height: 16,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Container(
+                          margin: EdgeInsets.only(bottom: 16),
+                          child: ElevatedButton(
+                            onPressed: () {
+                              showColorPicker();
+                            },
+                            child: Icon(Icons.color_lens),
+                            style: ButtonStyle(
+                              shape: MaterialStateProperty.all(CircleBorder()),
+                              padding:
+                                  MaterialStateProperty.all(EdgeInsets.all(10)),
+                              backgroundColor: MaterialStateProperty.all(
+                                  ChordLogColors.primary),
                             ),
-                            for (int i = 0; i < dataFiltered.length; i++)
-                              DropdownMenuItem(
-                                child: Text(dataFiltered[i][1].toString()),
-                                value: dataFiltered[i][1].toString(),
-                              ),
-                          ],
-                          value: selectedChordType,
-                          onChanged: (String? selected) {
-                            if (selected != null && selected.isNotEmpty) {
-                              final selectedChord = dataFiltered.firstWhere(
-                                  (element) => element[1] == selected);
-                              Chord newChord = Chord.createChordFromLibRow(
-                                  selectedChord);
-                              _setChordType(newChord);
-                            } else {
-                              _setChordType(null);
-                            }
-                          }),
-                    ],
-                  );
-                }
-                return Container();
-              })),
-          Row(
-            children: [
-              Text('Starting fret'),
-              NumberPicker(
-                  min: 1, max: 19, value: startFret, update: _setStartFret),
-            ],
-          ),
-          Expanded(child: Container()),
-          FretboardWidget(
-              addNote: addNote,
-              startFret: startFret,
-              enabledNotes: selectedBaseChord == null
-                  ? Provider.of<LogProvider>(context, listen: false)
-                      .scale!
-                      .notes
-                  : selectedBaseChord!.noteLabels)
-        ],
+                          ),
+                        ),
+                        Container(
+                          color: currentColor,
+                          child: ChordCardWidget(
+                              paintSize: 225,
+                              name: _getChordName(),
+                              numStrings: numStrings,
+                              startFret: startFret,
+                              notes: GuitarChord.toDrawCardDotsPos(
+                                  chordCardNotes, startFret)),
+                        ),
+                        Container(
+                          margin: EdgeInsets.only(bottom: 16),
+                          child: ElevatedButton(
+                            onPressed: () {},
+                            child: Icon(Icons.volume_up),
+                            style: ButtonStyle(
+                              shape: MaterialStateProperty.all(CircleBorder()),
+                              padding:
+                                  MaterialStateProperty.all(EdgeInsets.all(10)),
+                              backgroundColor: MaterialStateProperty.all(
+                                  ChordLogColors.primary),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    CreateChordControlsWidget(
+                        startFret: startFret,
+                        setStartFret: _setStartFret,
+                        chordKey: selectedRootLabel,
+                        chordType: selectedChordType,
+                        makeSuggestion: suggestChord,
+                        hasSuggested: hasSuggested,
+                        notes: selectedBaseChord != null
+                            ? selectedBaseChord!.noteLabels
+                            : chordNotes.map((e) => e?.getNoteLabel()).toList(),
+                        submitKey: _setRootNote,
+                        submitChord: setChordTypeDef),
+                    SizedBox(
+                      height: 32,
+                    ),
+                    ElevatedButton(
+                        onPressed: () => _submit(context),
+                        child: Text('Save Chord')),
+                    SizedBox(
+                      height:
+                          isFretboardVisibile ? 25.0 * (numStrings - 2) : 32,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: GestureDetector(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                        width: MediaQuery.of(context).size.width,
+                        color: ChordLogColors.bodyColor,
+                        child: TextButton(
+                          child: isFretboardVisibile
+                              ? Icon(
+                                  Icons.arrow_downward_rounded,
+                                  color: Colors.white,
+                                )
+                              : Icon(
+                                  Icons.arrow_upward_rounded,
+                                  color: Colors.white,
+                                ),
+                          style: TextButton.styleFrom(
+                            padding: EdgeInsets.zero,
+                            minimumSize: Size(50, 30),
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
+                          onPressed: () => _setFretboardVisibility(
+                              isFretboardVisibile ? false : true),
+                        )),
+                    AnimatedContainer(
+                      duration: Duration(milliseconds: 250),
+                      height: isFretboardVisibile
+                          ? chordCardNotes.length * 30.0 + 20
+                          : 0,
+                      child: Wrap(
+                        children: [
+                          FretboardWidget(
+                              addNote: addNote,
+                              startFret: startFret,
+                              enabledNotes: selectedBaseChord == null
+                                  ? chordNotes.any((element) => element != null)
+                                      ? Provider.of<LogProvider>(context,
+                                              listen: false)
+                                          .scale!
+                                          .notes
+                                      : [selectedRootLabel]
+                                  : selectedBaseChord!.noteLabels),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            )
+          ]),
+        ),
       ),
     );
   }
@@ -269,6 +415,7 @@ class _CreateChordScreenState extends State<CreateChordScreen> {
 
 class CreateChordArgs {
   final GuitarChord? chord;
+  int logIndex;
 
-  CreateChordArgs({this.chord});
+  CreateChordArgs({this.chord, this.logIndex = -1});
 }

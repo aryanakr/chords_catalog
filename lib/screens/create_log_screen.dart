@@ -25,7 +25,7 @@ class CreateLogScreen extends StatelessWidget {
       print('Got scale ${scale.base.name} with notes ${scale.notes}');
       Provider.of<LogProvider>(context, listen: false)
           .setLog(logName, tuning, sound, scale);
-      Navigator.of(context).pushNamed(DashboardScreen.routeName);
+      Navigator.of(context).pushNamedAndRemoveUntil(DashboardScreen.routeName, (route) => false);
     }
 
     Map<int, List<Tuning>> _parseTuningList(Map<String, dynamic> data) {
@@ -63,46 +63,47 @@ class CreateLogScreen extends StatelessWidget {
     }
 
     return Scaffold(
-        appBar: AppBar(
-          title: const Text('Create Log'),
-        ),
-        body: Container(
-          height: MediaQuery.of(context).size.height,
-          decoration:
-              const BoxDecoration(gradient: ChordLogColors.backGroundGradient),
-          child: FutureBuilder(
-              future: Future.wait([
-                Tuning.loadLib(),
-                LogScale.loadLib()
-              ]),
-              builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
-                if (!snapshot.hasData) {
-                  return Center(child: CircularProgressIndicator());
-                }
-
-                final tunings = _parseTuningList(snapshot.data![0]);
-                final scales = _parseScaleList(snapshot.data![1]);
-
-                return SingleChildScrollView(
-                  scrollDirection: Axis.vertical,
-                  child: Container(
-                    height: 900,
-                    width: MediaQuery.of(context).size.width,
-                    child: Center(
-                      child: Container(
-                        margin: const EdgeInsets.all(16),
-                        child: Card(
-                          child: LogConfigurationWidget(
-                            submit: _onLogConfigSubmited,
-                            loadedTunings: tunings,
-                            loadedScales: scales,
-                          ),
+        body: NestedScrollView(
+          headerSliverBuilder: (context, innerBoxIsScrolled) => [
+              const SliverAppBar(
+                title: Text("Create New Log"),
+                backgroundColor: ChordLogColors.bodyColor,
+              ),
+          ],
+          body: SingleChildScrollView(
+            child: Container(
+              decoration:
+                  const BoxDecoration(gradient: ChordLogColors.backGroundGradient),
+              child: FutureBuilder(
+                  future: Future.wait([
+                    Tuning.loadLib(),
+                    LogScale.loadLib()
+                  ]),
+                  builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
+                    if (!snapshot.hasData) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                  
+                    final tunings = _parseTuningList(snapshot.data![0]);
+                    final scales = _parseScaleList(snapshot.data![1]);
+                  
+                    return Container(
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(38),
+                          topRight: Radius.circular(38),
                         ),
                       ),
-                    ),
-                  ),
-                );
-              }),
+                      child: LogConfigurationWidget(
+                        submit: _onLogConfigSubmited,
+                        loadedTunings: tunings,
+                        loadedScales: scales,
+                      ),
+                    );
+                  }),
+            ),
+          ),
         ));
   }
 }

@@ -11,20 +11,16 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Chord Logs'),
-      ),
       body: Container(
         decoration: const BoxDecoration(
-                gradient: ChordLogColors.backGroundGradient),
+                gradient: ChordLogColors.mainBackgroundColor),
         child: Center(
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const SizedBox(height: 32),
-              const Text("Chord Logs", style: TextStyle(fontSize: 64, fontFamily: 'GreatVibes' )),
-              const SizedBox(height: 12,),
-              Container(margin: const EdgeInsets.symmetric(horizontal: 18), child: const Text("Helps you with get more familiar with your guitar", style: TextStyle(fontSize: 22), textAlign: TextAlign.center)),
-              const SizedBox(height: 28,),
+              const SizedBox(height: 16),
+              Container(margin: const EdgeInsets.symmetric(horizontal: 16) ,child: const Text("Guitar Chord Logs", style: TextStyle(fontSize: 58, fontFamily: 'GreatVibes'), textAlign: TextAlign.center)),
+              const SizedBox(height: 30,),
               SizedBox(
                 width: screenSize.width / 4 * 3,
                 height: screenSize.height / 2 * 1,
@@ -36,7 +32,7 @@ class HomeScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         ElevatedButton(
-                          child: const Text('New Log'),
+                          child: const Text('Create New Log'),
                           onPressed: () {
                             Navigator.of(context).pushNamed(CreateLogScreen.routeName);
                           },

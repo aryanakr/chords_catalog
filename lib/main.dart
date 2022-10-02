@@ -5,6 +5,7 @@ import 'package:chords_catalog/screens/dashboard_screen.dart';
 import 'package:chords_catalog/screens/home_screen.dart';
 import 'package:chords_catalog/theme/chord_log_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import 'providers/log_provider.dart';
@@ -20,16 +21,18 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
     return MultiProvider(
       providers: [
         ChangeNotifierProvider<LogProvider>(create: (context) => LogProvider(name: '', sound: null, tuning: null, scale: null, chords: [])),
         ChangeNotifierProvider<SoundPlayerProvider>(create: (context) => SoundPlayerProvider()),],
       child: MaterialApp(
         title: 'Flutter Demo',
+        debugShowCheckedModeBanner: false,
         theme: ThemeData(
           colorScheme: ColorScheme.fromSwatch(
             primarySwatch: ChordLogColors.materialPrimary
-          ).copyWith(secondary:  ChordLogColors.secondary),
+          ).copyWith(secondary:  ChordLogColors.secondary, onPrimary: Colors.white),
         ),
         home: const HomeScreen(),
         routes: {

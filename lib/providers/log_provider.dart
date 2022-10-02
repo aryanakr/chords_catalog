@@ -26,8 +26,12 @@ class LogProvider extends ChangeNotifier {
     this.scale = scale;
   }
 
-  void addChord(GuitarChord chord) {
-    chords.add(chord);
+  void saveChord({required GuitarChord chord, int index = -1}) {
+    if (index == -1) {
+      chords.add(chord);
+    } else {
+      chords[index] = chord;
+    }
   }
 
 
