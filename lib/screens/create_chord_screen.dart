@@ -3,6 +3,7 @@ import 'package:chords_catalog/components/painters/chord_card_painter.dart';
 import 'package:chords_catalog/models/chord.dart';
 import 'package:chords_catalog/models/note.dart';
 import 'package:chords_catalog/providers/log_provider.dart';
+import 'package:chords_catalog/providers/sound_player_provider.dart';
 import 'package:chords_catalog/screens/chord_view_screen.dart';
 import 'package:chords_catalog/screens/dashboard_screen.dart';
 import 'package:chords_catalog/widgets/chord_card_widget.dart';
@@ -110,6 +111,25 @@ class _CreateChordScreenState extends State<CreateChordScreen> {
     });
 
     return true;
+  }
+
+  void _playChord() {
+
+    if (!chordNotes.any((element) => element != null)) {
+      return;
+    }
+
+    final guitarChord = GuitarChord(
+        chord: selectedBaseChord!,
+        name: _getChordName(),
+        cardDotsPos: chordCardNotes,
+        startFret: startFret,
+        midiNotes: chordNotes,
+        cardColor: currentColor);
+    
+    final soundPlayer = Provider.of<SoundPlayerProvider>(context, listen: false);
+
+    soundPlayer.startSequence(guitarChord.getDemoSequence());
   }
 
   String _getChordName() {
@@ -256,7 +276,7 @@ class _CreateChordScreenState extends State<CreateChordScreen> {
             backgroundColor: ChordLogColors.bodyColor,
             actions: [
               IconButton(
-                  onPressed: () => _submit(context), icon: Icon(Icons.check))
+                  onPressed: () => _submit(context), icon: const Icon(Icons.save))
             ],
           )
         ],
@@ -312,7 +332,7 @@ class _CreateChordScreenState extends State<CreateChordScreen> {
                         Container(
                           margin: EdgeInsets.only(bottom: 16),
                           child: ElevatedButton(
-                            onPressed: () {},
+                            onPressed: _playChord,
                             child: Icon(Icons.volume_up),
                             style: ButtonStyle(
                               shape: MaterialStateProperty.all(CircleBorder()),

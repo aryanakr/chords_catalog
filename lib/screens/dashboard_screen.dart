@@ -2,6 +2,7 @@ import 'package:chords_catalog/models/chord.dart';
 import 'package:chords_catalog/providers/log_provider.dart';
 import 'package:chords_catalog/screens/create_chord_screen.dart';
 import 'package:chords_catalog/screens/create_log_screen.dart';
+import 'package:chords_catalog/screens/progressions_screen.dart';
 import 'package:chords_catalog/theme/chord_log_custom_icons_icons.dart';
 import 'package:chords_catalog/widgets/chord_card_widget.dart';
 import 'package:flutter/material.dart';
@@ -83,14 +84,14 @@ class DashboardScreen extends StatelessWidget {
         selectedItemColor: ChordLogColors.bodyColor,
         onTap: (index) {
           if (index == 1) {
-            Navigator.of(context).pushNamed(CreateLogScreen.routeName);
+            Navigator.of(context).pushReplacementNamed(ProgressionsScreen.routeName);
           }
         },
       ),
       body: NestedScrollView(
         headerSliverBuilder: (context, innerBoxIsScrolled) => [
           const SliverAppBar(
-            title: Text("Saved Chords"),
+            title: Text("Chords"),
             backgroundColor: ChordLogColors.bodyColor,
           ),
         ],

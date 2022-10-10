@@ -42,6 +42,7 @@ dependencies:
   flutter_picker: ^2.0.5
   flutter_colorpicker: ^1.0.3
   random_color: ^1.0.6-nullsafety
+  scrollable_positioned_list: ^0.3.5
 
 dev_dependencies:
   flutter_test:

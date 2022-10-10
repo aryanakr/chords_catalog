@@ -24,8 +24,8 @@ class ChordCardPainter extends CustomPainter {
         ..strokeWidth = 2;
 
     // Frame
-    final framePaddingVertical = 30.0;
-    final framePaddingHorizental = 30.0;
+    final framePaddingVertical = 16.0;
+    final framePaddingHorizental = 22.0;
 
 
     final frameTopLeftOffset = Offset(framePaddingHorizental, framePaddingVertical);
@@ -41,9 +41,9 @@ class ChordCardPainter extends CustomPainter {
 
     // draw fret text
     if (startFret > 1) {
-      final fretTextStyle = TextStyle(color: Colors.black, fontSize: 18);
-      final textSpan = TextSpan(text: 'f$startFret', style: fretTextStyle);
-      final textPainter = TextPainter(text: textSpan, textDirection: TextDirection.ltr);
+      final fretTextStyle = TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: size.width/12);
+      final textSpan = TextSpan(text: '$startFret', style: fretTextStyle);
+      final textPainter = TextPainter(text: textSpan, textDirection: TextDirection.ltr, );
       textPainter.layout(minWidth: 0, maxWidth: size.width);
       final fretTextOffset = Offset(frameTopRightOffset.dx + 8, frameTopRightOffset.dy +2);
       textPainter.paint(canvas, fretTextOffset);
@@ -75,10 +75,10 @@ class ChordCardPainter extends CustomPainter {
       double dx = framePaddingHorizental + stringsPadding * i;
       final note = notes [i];
       if (note == null){
-        drawCross(canvas, Offset(dx, noteCirclesRadius+7), noteCirclesRadius, strockPaint);
+        drawCross(canvas, Offset(dx, noteCirclesRadius - size.height / 30), noteCirclesRadius, strockPaint);
       }
       else if (note == 0) {
-        canvas.drawCircle(Offset(dx, noteCirclesRadius+7), noteCirclesRadius, strockPaint);
+        canvas.drawCircle(Offset(dx, noteCirclesRadius - size.height / 30), noteCirclesRadius, strockPaint);
       } else {
         double dy = framePaddingVertical + (note * fretsPadding) - fretsPadding/2;
         canvas.drawCircle(Offset(dx, dy), noteCirclesRadius, paint);

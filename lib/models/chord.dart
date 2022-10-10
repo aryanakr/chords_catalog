@@ -1,5 +1,6 @@
 
 
+import 'package:chords_catalog/models/midi_sequence.dart';
 import 'package:chords_catalog/models/note.dart';
 import 'package:csv/csv.dart';
 import 'package:flutter/material.dart';
@@ -52,4 +53,82 @@ class GuitarChord {
   }
 
   GuitarChord({required this.chord, required this.name, required this.cardDotsPos, required this.startFret, required this.midiNotes, required this.cardColor});
+
+  List<SequenceNote> getDownStrockSequenceNotes(NoteWeight weight) {
+    List<SequenceNote> notes = [];
+    for (int i = 0 ; i<midiNotes.length ; i++) {
+      if (midiNotes[i] != null) {
+        final sequenceNote = SequenceNote(
+          notes: [midiNotes[i]!],
+          weight: weight
+        );
+        notes.add(sequenceNote);
+      }      
+    }
+    return notes;
+  }
+
+  MidiSequence getDownStrockSequence(NoteWeight weight, int tempo) {
+    List<SequenceNote> notes = getDownStrockSequenceNotes(weight);
+    return MidiSequence(notes: notes, tempo: tempo);
+  }
+
+  List<SequenceNote> getUpStrockSequenceNotes(NoteWeight weight) {
+    List<SequenceNote> notes = [];
+    for (int i = midiNotes.length-1 ; i>=0 ; i--) {
+      if (midiNotes[i] != null) {
+        final sequenceNote = SequenceNote(
+          notes: [midiNotes[i]!],
+          weight: weight
+        );
+        notes.add(sequenceNote);
+      }      
+    }
+    return notes;
+  }
+
+  List<SequenceNote> getSequenceNotesByMode(NoteWeight weight, ChordPLayMode mode) {
+    switch(mode) {
+      case ChordPLayMode.downArpeggio:
+        return getDownStrockSequenceNotes(weight);
+      case ChordPLayMode.upArpeggio:
+        return getUpStrockSequenceNotes(weight);
+      case ChordPLayMode.strum:
+        return [getStrumSequenceNote(weight)];
+    }
+  }
+
+  MidiSequence getUpStrockSequence(NoteWeight weight, int tempo) {
+    List<SequenceNote> notes = getUpStrockSequenceNotes(weight);
+    return MidiSequence(notes: notes, tempo: tempo);
+  }
+
+  SequenceNote getStrumSequenceNote(NoteWeight weight) {
+    List<MidiNote> notes = [];
+    for (int i = 0 ; i < midiNotes.length; i++) {
+      if (midiNotes[i] != null) {
+        notes.add(midiNotes[i]!);
+      }      
+    }
+    return SequenceNote(notes: notes, weight: weight);
+  }
+
+  MidiSequence getDemoSequence() {
+    final downStrock = getDownStrockSequence(NoteWeight.eighth, 120);
+    final upStrock = getUpStrockSequence(NoteWeight.eighth, 120);
+    final strumNotes = getStrumSequenceNote(NoteWeight.half);
+    final strum = MidiSequence(notes: [strumNotes], tempo: 120);
+    final restNotes = SequenceNote(notes: [], weight: NoteWeight.quarter);
+    final rest = MidiSequence(notes: [restNotes], tempo: 120);
+
+    final sequence =  MidiSequence.getMerged([downStrock,rest, strum, rest, upStrock], 120);
+    return sequence;
+  }
+
+}
+
+enum ChordPLayMode{
+  downArpeggio,
+  strum,
+  upArpeggio
 }

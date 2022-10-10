@@ -9,10 +9,18 @@ class MidiSequence {
   MidiSequence({required this.tempo, required this.notes, this.loop = false});
 
   int get baseDuration => (60000 / tempo / 8).round();
+
+  static MidiSequence getMerged(List<MidiSequence> sequences, int tempo) {
+    List<SequenceNote> mnotes = [];
+    for (int i = 0; i < sequences.length; i++) {
+      mnotes.addAll(sequences[i].notes);
+    }
+    return MidiSequence(tempo: tempo, notes: mnotes);
+  }
 }
 
 class SequenceNote{
-  final List<MidiNote> notes; // null for rest
+  final List<MidiNote> notes; // empty for rest
   final NoteWeight weight; // 1/32 notes (eg. 8 = Quarter note or 1 beat)
 
   SequenceNote({required this.notes, required this.weight});
