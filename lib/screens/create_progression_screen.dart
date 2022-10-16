@@ -3,6 +3,7 @@ import 'package:chords_catalog/models/midi_sequence.dart';
 import 'package:chords_catalog/models/progression.dart';
 import 'package:chords_catalog/providers/log_provider.dart';
 import 'package:chords_catalog/providers/sound_player_provider.dart';
+import 'package:chords_catalog/screens/progressions_screen.dart';
 import 'package:chords_catalog/theme/chord_log_colors.dart';
 import 'package:chords_catalog/theme/chord_log_custom_icons_icons.dart';
 import 'package:chords_catalog/widgets/progression_view_widget.dart';
@@ -22,39 +23,50 @@ class CreateProgressionScreen extends StatefulWidget {
 }
 
 class _CreateProgressionScreenState extends State<CreateProgressionScreen> {
-  void submit() {}
+  void submit() {
+
+    if (_nameController.text.isEmpty) {
+      const snackBar = SnackBar(
+        content: Text('Please enter a name for the progression.'),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      return;
+    }
+
+    final log = Provider.of<LogProvider>(context, listen: false);
+
+    final sequences =progressionUIContent.map((e) => e.sequence).toList();
+    final sequence = MidiSequence.getMerged(sequences, tempo);
+
+    final progression = Progression(
+      name: _nameController.text,
+      sequence: sequence,
+      contentElements: progressionUIContent,
+    );
+
+    log.saveProgression(progression);
+
+    // remove navigator content and go back to progressions screen
+    Navigator.of(context).pushNamedAndRemoveUntil(ProgressionsScreen.routeName,(route) => route.isFirst);
+  }
 
   void addChord(GuitarChord? chord) {
     final weight = getSelectedWeight();
     final mode = getSelectedPlayMode();
 
     setState(() {
-      if (editIndex >= progressionContent.length) {
-        progressionUIContent.add(ProgressionUIContentElement(
-            chord: chord, weight: weight, playMode: mode));
-      } else {
-        progressionUIContent[editIndex] = ProgressionUIContentElement(
-            chord: chord, weight: weight, playMode: mode);
-      }
 
-      if (chord == null) {
-        // add silent
-        final sequence = MidiSequence(
-            tempo: tempo, notes: [SequenceNote(notes: [], weight: weight)]);
-        if (editIndex >= progressionContent.length) {
-          progressionContent.add(sequence);
-        } else {
-          progressionContent[editIndex] = sequence;
-        }
+      MidiSequence sequence = chord == null ? 
+        MidiSequence(
+            tempo: tempo, notes: [SequenceNote(notes: [], weight: weight)])
+       : 
+        MidiSequence(tempo: tempo, notes: chord.getSequenceNotesByMode(weight, mode));
+      
+      final newContent = ProgressionContentElement(chord: chord, weight: weight, playMode: mode, sequence: sequence);
+      if (editIndex >= progressionUIContent.length) {
+        progressionUIContent.add(newContent);
       } else {
-        // add chord
-        final notes = chord.getSequenceNotesByMode(weight, mode);
-        final sequence = MidiSequence(tempo: tempo, notes: notes);
-        if (editIndex >= progressionContent.length) {
-          progressionContent.add(sequence);
-        } else {
-          progressionContent[editIndex] = sequence;
-        }
+        progressionUIContent[editIndex] = newContent;
       }
       moveEditForward();
     });
@@ -79,16 +91,16 @@ class _CreateProgressionScreenState extends State<CreateProgressionScreen> {
     setState(() {
       print(editIndex);
       progressionUIContent.removeAt(editIndex);
-      progressionContent.removeAt(editIndex);
     });
   }
 
   void demoChord(GuitarChord chord) {}
 
   void play() {
-    print(progressionContent.length);
 
-    final sequence = MidiSequence.getMerged(progressionContent, tempo);
+    final sequences =progressionUIContent.map((e) => e.sequence).toList();
+
+    final sequence = MidiSequence.getMerged(sequences, tempo);
     Provider.of<SoundPlayerProvider>(context, listen: false)
         .startSequence(sequence);
   }
@@ -135,8 +147,7 @@ class _CreateProgressionScreenState extends State<CreateProgressionScreen> {
   int tempo = 120;
   int editIndex = 0;
 
-  List<ProgressionUIContentElement> progressionUIContent = [];
-  List<MidiSequence> progressionContent = [];
+  List<ProgressionContentElement> progressionUIContent = [];
 
   final TextEditingController _nameController = TextEditingController();
   @override
@@ -253,7 +264,6 @@ class _CreateProgressionScreenState extends State<CreateProgressionScreen> {
 
   Widget controlPanel(bool isPlaying) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 8),
       color: ChordLogColors.secondary,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -274,11 +284,12 @@ class _CreateProgressionScreenState extends State<CreateProgressionScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  TextButton(
-                      onPressed: editIndex < progressionContent.length
+                  IconButton(
+                      color: ChordLogColors.primary,
+                      onPressed: editIndex < progressionUIContent.length
                           ? deleteNote
                           : null,
-                      child: Icon(Icons.delete)),
+                      icon: Icon(Icons.delete)),
                   controlPanelWeightSelection()
                 ],
               )
@@ -287,11 +298,12 @@ class _CreateProgressionScreenState extends State<CreateProgressionScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   controlPanelMainActions(isPlaying),
-                  TextButton(
-                      onPressed: editIndex < progressionContent.length
+                  IconButton(
+                      color: ChordLogColors.primary,
+                      onPressed: editIndex < progressionUIContent.length
                           ? deleteNote
                           : null,
-                      child: Icon(Icons.delete)),
+                      icon: Icon(Icons.delete)),
                   controlPanelModeSelection(),
                   controlPanelWeightSelection()
                 ],
@@ -316,14 +328,14 @@ class _CreateProgressionScreenState extends State<CreateProgressionScreen> {
             icon: Icon(Icons.arrow_back)),
         IconButton(
             color: ChordLogColors.primary,
-            onPressed: progressionContent.length > 0
+            onPressed: progressionUIContent.length > 0
                 ? (isPlaying ? stop : play)
                 : null,
             icon: isPlaying ? Icon(Icons.stop) : Icon(Icons.play_arrow)),
         IconButton(
             color: ChordLogColors.primary,
             onPressed:
-                editIndex < progressionContent.length ? moveEditForward : null,
+                editIndex < progressionUIContent.length ? moveEditForward : null,
             icon: Icon(Icons.arrow_forward)),
       ],
     );

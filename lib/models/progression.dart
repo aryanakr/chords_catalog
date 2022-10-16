@@ -4,15 +4,17 @@ import 'package:chords_catalog/models/midi_sequence.dart';
 class Progression {
   final MidiSequence sequence;
   final String name;
+  final List<ProgressionContentElement> contentElements;
 
-  Progression({required this.sequence, required this.name});
+  Progression({required this.sequence, required this.name, required this.contentElements});
 }
 
-class ProgressionUIContentElement {
+class ProgressionContentElement {
   final GuitarChord? chord;
   final NoteWeight weight;
   final ChordPLayMode playMode;
+  final MidiSequence sequence;
 
-  ProgressionUIContentElement({required this.chord, required this.weight, required this.playMode});
+  ProgressionContentElement({required this.chord, required this.weight, required this.playMode, required this.sequence});
   
 }

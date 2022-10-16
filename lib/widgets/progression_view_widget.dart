@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 class ProgressionViewWidget extends StatelessWidget {
-  final List<ProgressionUIContentElement> content;
+  final List<ProgressionContentElement> content;
   final int editIndex;
   final bool isPlaying;
 
@@ -65,14 +65,13 @@ class ProgressionViewWidget extends StatelessWidget {
 
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) { 
       if (!isPlaying) {
-        itemScrollController.scrollTo(index: editIndex, duration: Duration(milliseconds: 500));
+        itemScrollController.scrollTo(index: editIndex, duration: Duration(milliseconds: 500), curve: Curves.easeInOut);
       }
     });
 
     return Container(
       height: 120,
       padding: EdgeInsets.only(bottom: 4),
-      width: MediaQuery.of(context).size.width,
       decoration: BoxDecoration(border: Border(bottom: BorderSide(width: 2, color: Colors.black),)),
       child: ScrollablePositionedList.builder(
         itemCount: editIndex >= content.length ? content.length +1 : content.length,

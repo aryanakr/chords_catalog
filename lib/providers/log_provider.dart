@@ -37,5 +37,9 @@ class LogProvider extends ChangeNotifier {
     }
   }
 
+  void saveProgression(Progression) {
+    progressions.add(Progression);
+  }
+
 
 }
