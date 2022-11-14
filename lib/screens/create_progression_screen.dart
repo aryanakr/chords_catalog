@@ -44,7 +44,7 @@ class _CreateProgressionScreenState extends State<CreateProgressionScreen> {
       contentElements: progressionUIContent,
     );
 
-    log.saveProgression(progression);
+    log.saveProgression(progression: progression);
 
     // remove navigator content and go back to progressions screen
     Navigator.of(context).pushNamedAndRemoveUntil(ProgressionsScreen.routeName,(route) => route.isFirst);

@@ -36,12 +36,46 @@ class Chord {
 
 class GuitarChord {
 
+  int id;
   final Chord chord;
   final List<int?> cardDotsPos;
   final String name;
   final int startFret;
   final List<MidiNote?> midiNotes;
   final Color cardColor;
+
+
+  Map<String, dynamic> toMap(int logId) {
+    return {
+      'name': name,
+      'root': chord.root,
+      'type': chord.type,
+      'structure': chord.structure,
+      'note_labels': chord.noteLabels.join(','),
+      'card_dots_pos': cardDotsPos.join(','),
+      'start_fret': startFret,
+      'notes': midiNotes.map((e) => e?.midiNumber).join(','),
+      'color': cardColor.value,
+      'log_id': logId,
+    };
+  }
+
+  static GuitarChord fromMap(Map<String, dynamic> map) {
+    return GuitarChord(
+      id: map['id'],
+      chord: Chord(
+        root: map['root'],
+        type: map['type'],
+        structure: map['structure'],
+        noteLabels: map['note_labels'].split(','),
+      ),
+      cardDotsPos: map['card_dots_pos'].split(',').map((e) => int.parse(e)).toList(),
+      name: map['name'],
+      startFret: map['start_fret'],
+      midiNotes: map['notes'].split(',').map((e) => MidiNote.byMidiNumber(midiNumber: int.parse(e))).toList(),
+      cardColor: Color(map['color']),
+    );
+  }
 
   List<int?> drawCardDotsPos() {
 
@@ -52,7 +86,7 @@ class GuitarChord {
     return notes.map((e) => e == null || e == 0 ? e : e - startFret + 1).toList();
   }
 
-  GuitarChord({required this.chord, required this.name, required this.cardDotsPos, required this.startFret, required this.midiNotes, required this.cardColor});
+  GuitarChord({this.id = -1, required this.chord, required this.name, required this.cardDotsPos, required this.startFret, required this.midiNotes, required this.cardColor});
 
   List<SequenceNote> getDownStrockSequenceNotes(NoteWeight weight) {
     List<SequenceNote> notes = [];

@@ -14,15 +14,40 @@ class InstrumentSound {
     InstrumentSound(path: 'assets/PerfectSine.sf2', name: 'PerfectSine'),
     InstrumentSound(path: 'assets/Piano.sf2', name: 'Piano')
   ];
+
+  static getSoundFromName(String name) {
+    return DefaultSounds.firstWhere((element) => element.name == name);
+  }
 }
 
 class Tuning {
+  late int id;
   late String name;
   late List<MidiNote?> openNotes;
   late bool isCustomTuning;
   late int numStrings;
 
-  Tuning({required this.name, required this.openNotes, required this.numStrings, this.isCustomTuning = false});
+  Tuning({this.id = -1, required this.name, required this.openNotes, required this.numStrings, this.isCustomTuning = false});
+
+
+  Map<String, dynamic> toMap() {
+    return {
+      'name': name,
+      'open_notes': openNotes.map((e) => e!.label).join(','),
+      'num_strings': numStrings,
+      'is_custom': isCustomTuning ? 1 : 0,
+    };
+  }
+
+  static Tuning fromMap(Map<String, dynamic> map) {
+    return Tuning(
+      id: map['id'],
+      name: map['name'],
+      openNotes: map['open_notes'].split(',').map((e) => MidiNote.byLabel(label : e)).toList(),
+      numStrings: map['num_strings'],
+      isCustomTuning: map['is_custom'] == 1,
+    );
+  }
 
   Tuning.standardTuning() {
     openNotes = [

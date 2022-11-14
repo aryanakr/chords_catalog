@@ -5,11 +5,35 @@ import 'package:csv/csv.dart';
 import 'package:flutter/services.dart';
 
 class LogScale {
+  int id;
   String root;
   List<String> notes;
   BaseScale base;
 
-  LogScale({required this.root, required this.notes, required this.base});
+  LogScale({this.id = -1, required this.root, required this.notes, required this.base});
+
+  Map<String, dynamic> toMap() {
+    return {
+      'root': root,
+      'name': base.name,
+      'intervals': base.intervals.join(','),
+      'notes': notes.join(','),
+      'is_custom': base.isCustomScale,
+    };
+  }
+
+  static LogScale fromMap(Map<String, dynamic> map) {
+    return LogScale(
+      id: map['id'],
+      root: map['root'],
+      notes: map['notes'].split(','),
+      base: BaseScale(
+        name: map['name'],
+        intervals: map['intervals'].split(',').map((e) => int.parse(e)).toList(),
+        isCustomScale: map['is_custom'] == 1,
+      ),
+    );
+  }
 
   
   static Future<List<List<dynamic>>> loadLib () async {
