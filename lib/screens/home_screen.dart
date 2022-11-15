@@ -1,12 +1,20 @@
 import 'package:chords_catalog/models/log.dart';
+import 'package:chords_catalog/providers/log_provider.dart';
 import 'package:chords_catalog/screens/create_log_screen.dart';
+import 'package:chords_catalog/screens/dashboard_screen.dart';
 import 'package:chords_catalog/theme/chord_log_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class HomeScreen extends StatelessWidget {
   static const routeName = '/home';
 
   const HomeScreen({Key? key}) : super(key: key);
+
+  void _loadLog(Log log, BuildContext context) {
+    Provider.of<LogProvider>(context, listen: false).loadLog(log);
+    Navigator.of(context).pushReplacementNamed(DashboardScreen.routeName);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,34 +54,63 @@ class HomeScreen extends StatelessWidget {
                           },
                         ),
                         const SizedBox(height: 16),
-                        FutureBuilder(
-                            future: Log.retrieveSavedLogs(),
-                            builder: (context, snapshot) {
-                              if (snapshot.hasData) {
-                                final List<Log> logs =
-                                    snapshot.data as List<Log>;
-                                return Expanded(
-                                    child: ListView.builder(
-                                        itemCount: logs.length,
-                                        itemBuilder: (context, index) {
-                                          return ListTile(
-                                              title: Text(logs[index].name),
-                                              onTap: () {});
-                                        }));
-                              } else if (snapshot.hasError) {
-                                return Center(
-                                  child: Text('Error: ${snapshot.error}'),
-                                );
-                              } else {
-                                return const Center(
-                                  child: SizedBox(
-                                    width: 60,
-                                    height: 60,
-                                    child: CircularProgressIndicator(),
-                                  ),
-                                );
-                              }
-                            })
+                        Container(
+                          color: Colors.grey,
+                          child: Column(
+                            children: [
+                              Container(
+                                height: 40,
+                                color: Colors.blue,
+                                child: Row(
+                                  children: [
+                                    Text('Log 1'),
+                                  ],
+                                ),
+                              
+                              ),
+                              MediaQuery.removePadding(
+                                removeTop: true,
+                                context: context,
+                                child: FutureBuilder(
+                                    future: Log.retrieveSavedLogs(),
+                                    builder: (context, snapshot) {
+                                      if (snapshot.hasData) {
+                                        final List<Log> logs =
+                                            snapshot.data as List<Log>;
+                                        return ListView.builder(
+                                          
+                                          itemCount: logs.length,
+                                          shrinkWrap: true,
+                                          itemBuilder: (context, index) {
+                                            return InkWell(
+                                              onTap: () => _loadLog(logs[index], context), // Navigate to dashboard
+                                              child: Container(
+                                                height: 55,
+                                                child: Card(
+                                                  color: Colors.red,
+                                                  child: Text(logs[index].name)
+                                                ),
+                                              ),
+                                            );
+                                          });
+                                      } else if (snapshot.hasError) {
+                                        return Center(
+                                          child: Text('Error: ${snapshot.error}'),
+                                        );
+                                      } else {
+                                        return const Center(
+                                          child: SizedBox(
+                                            width: 60,
+                                            height: 60,
+                                            child: CircularProgressIndicator(),
+                                          ),
+                                        );
+                                      }
+                                    }),
+                              ),
+                            ],
+                          ),
+                        )
                       ],
                     ),
                   ),

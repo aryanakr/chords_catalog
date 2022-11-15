@@ -44,7 +44,7 @@ class _CreateProgressionScreenState extends State<CreateProgressionScreen> {
       contentElements: progressionUIContent,
     );
 
-    log.saveProgression(progression: progression);
+    log.saveProgression(progression: progression, index: progressionIndex);
 
     // remove navigator content and go back to progressions screen
     Navigator.of(context).pushNamedAndRemoveUntil(ProgressionsScreen.routeName,(route) => route.isFirst);
@@ -147,11 +147,31 @@ class _CreateProgressionScreenState extends State<CreateProgressionScreen> {
   int tempo = 120;
   int editIndex = 0;
 
+  int progressionIndex = -1;
+
   List<ProgressionContentElement> progressionUIContent = [];
 
   final TextEditingController _nameController = TextEditingController();
+
+  void loadProgression(CreateProgressionArgs args) {
+    if (args.progression == null) {
+      return;
+    }
+
+    setState(() {
+      tempo = args.progression!.sequence.tempo;
+      _nameController.text = args.progression!.name;
+      progressionUIContent = args.progression!.contentElements;
+      progressionIndex = args.index;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+
+    final args = ModalRoute.of(context)!.settings.arguments as CreateProgressionArgs;
+    loadProgression(args);
+
     final isPlaying = Provider.of<SoundPlayerProvider>(context).isPlaying;
 
     return Scaffold(
@@ -443,4 +463,11 @@ class _CreateProgressionScreenState extends State<CreateProgressionScreen> {
       ),
     );
   }
+}
+
+class CreateProgressionArgs {
+  final Progression? progression;
+  int index;
+
+  CreateProgressionArgs({this.progression, this.index = -1});
 }

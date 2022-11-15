@@ -1,11 +1,13 @@
+import 'package:chords_catalog/helpers/db_helper.dart';
 import 'package:chords_catalog/models/chord.dart';
 import 'package:chords_catalog/models/midi_sequence.dart';
 import 'package:chords_catalog/models/note.dart';
 import 'package:csv/csv.dart';
 import 'package:flutter/services.dart';
+import 'package:collection/collection.dart';
 
 class LogScale {
-  int id;
+  int id = -1;
   String root;
   List<String> notes;
   BaseScale base;
@@ -15,34 +17,20 @@ class LogScale {
   Map<String, dynamic> toMap() {
     return {
       'root': root,
-      'name': base.name,
-      'intervals': base.intervals.join(','),
       'notes': notes.join(','),
-      'is_custom': base.isCustomScale,
+      'base_scale_id': base.id,
     };
   }
 
-  static LogScale fromMap(Map<String, dynamic> map) {
+  static LogScale fromMap(Map<String, dynamic> map, BaseScale baseScale) {
     return LogScale(
       id: map['id'],
       root: map['root'],
       notes: map['notes'].split(','),
-      base: BaseScale(
-        name: map['name'],
-        intervals: map['intervals'].split(',').map((e) => int.parse(e)).toList(),
-        isCustomScale: map['is_custom'] == 1,
-      ),
+      base: baseScale,
     );
   }
 
-  
-  static Future<List<List<dynamic>>> loadLib () async {
-    
-    final rawData = await rootBundle.loadString("assets/scales.csv");
-    final List<List<dynamic>> data = CsvToListConverter().convert(rawData);
-
-    return data;
-  }
 
   List<Triad> getTriads () {
 
@@ -148,11 +136,12 @@ class Triad extends Chord {
 }
 
 class BaseScale {
+  int id = -1;
   final String name;
   final List<int> intervals;
   final bool isCustomScale;
 
-  BaseScale({required this.name, required this.intervals, this.isCustomScale = false});
+  BaseScale({this.id = -1, required this.name, required this.intervals, this.isCustomScale = false});
 
   List<String> getNotes(String rootKey) {
     final allNotes = MidiNote.sharpNoteLabelsFromKey(rootKey);
@@ -174,7 +163,64 @@ class BaseScale {
     return res;
   }
 
+  static Future<List<BaseScale>> loadLib () async {
+
+    print(' scales');
+    
+    final rawData = await rootBundle.loadString("assets/scales.csv");
+    final List<List<dynamic>> data = CsvToListConverter().convert(rawData);
+
+    print('query scales');
+
+    final dbInstance = DBHelper.instance;
+    final List<BaseScale> dbScales = await dbInstance.queryAllBaseScales();
+    print('load scales');
+
+    return _parseScaleList(data, dbScales);
+  }
+
+  static List<BaseScale> _parseScaleList(List<List<dynamic>> data, List<BaseScale> dbScales) {
+
+    print('dbScales count = ${dbScales.length}');
+
+    final List<BaseScale> res = [];
+
+    final dbBaseScales = dbScales.map((e) => e).toList();
+
+    res.addAll(dbBaseScales);
+
+    Function eq = const ListEquality().equals;
+
+    for (int i = 1; i < data.length; i++) {
+      final List<int> intervals = data[i][1].toString().split(',').map((e) => int.parse(e)).toList();
+
+      final scale = BaseScale(name: data[i][0], intervals: intervals, isCustomScale: false);
+
+      if (!dbBaseScales.any((dbScale) => dbScale.name == scale.name)) {
+        res.add(scale);
+      }
+    }
+    return res;
+  }
+
   LogScale createLogScale(String rootKey) {
     return LogScale(root: rootKey, notes: getNotes(rootKey), base: this);
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'name': name,
+      'intervals': intervals.join(','),
+      'is_custom': isCustomScale ? 1 : 0,
+    };
+  }
+
+  static BaseScale fromMap(Map<String, dynamic> map) {
+    return BaseScale(
+      id: map['id'],
+      name: map['name'],
+      intervals: map['intervals'].toString().split(',').map((e) => int.parse(e)).toList(),
+      isCustomScale: map['is_custom'] == 1,
+    );
   }
 }

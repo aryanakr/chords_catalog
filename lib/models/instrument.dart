@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:chords_catalog/helpers/db_helper.dart';
 import 'package:chords_catalog/models/note.dart';
 import 'package:flutter/services.dart';
 
@@ -21,7 +22,7 @@ class InstrumentSound {
 }
 
 class Tuning {
-  late int id;
+  int id = -1;
   late String name;
   late List<MidiNote?> openNotes;
   late bool isCustomTuning;
@@ -40,13 +41,16 @@ class Tuning {
   }
 
   static Tuning fromMap(Map<String, dynamic> map) {
-    return Tuning(
+
+    final tuning = Tuning(
       id: map['id'],
       name: map['name'],
-      openNotes: map['open_notes'].split(',').map((e) => MidiNote.byLabel(label : e)).toList(),
+      openNotes: map['open_notes'].toString().split(',').map((e) => MidiNote.byLabel(label : e)).toList(),
       numStrings: map['num_strings'],
       isCustomTuning: map['is_custom'] == 1,
     );
+
+    return tuning;
   }
 
   Tuning.standardTuning() {
@@ -64,13 +68,55 @@ class Tuning {
 
   }
 
-  static Future<Map<String, dynamic>> loadLib() async {
+  static Future<Map<int, List<Tuning>>> loadLib() async {
 
     // Load the JSON file from the "assets" folder
     final String response = await rootBundle.loadString('assets/tunings.json');
     final Map<String, dynamic> data = await json.decode(response);
 
-    return data;
+    // Load from databse
+    final dbInstance = DBHelper.instance;
+    final dbTunings = await dbInstance.queryAllTunings();
+
+    return _parseTuningList(data, dbTunings);
+  }
+
+  static Map<int, List<Tuning>> _parseTuningList(Map<String, dynamic> data, List<Tuning> dbTunings) {
+
+    print('dbtuning count: ${dbTunings.length}');
+    final Map<int, List<Tuning>> res = {};
+
+    for (var t in dbTunings) {
+      if (!res.containsKey(t.numStrings)) {
+        res[t.numStrings] = [];
+      }
+      res[t.numStrings]!.add(t);
+    }
+
+    for (final numStr in data.keys) {
+      final Map<String, dynamic> strTunning = data[numStr];
+      final numStrasInt = int.parse(numStr);
+      final List<Tuning> tunings = [];
+      for (final key in strTunning.keys) {
+        final openNotes = strTunning[key]
+            .toString()
+            .split(',')
+            .map((e) => MidiNote.byLabel(label: e))
+            .toList();
+        final tuning =
+            Tuning(name: key, openNotes: openNotes, numStrings: numStrasInt);
+        tunings.add(tuning);
+      }
+
+      if (!res.containsKey(numStrasInt)) {
+        res[numStrasInt] = tunings;
+      } else {
+        final filteredTunings = tunings.where((element) => !res[numStrasInt]!.any((dbTuining) => dbTuining.name == element.name)).toList();
+        res[numStrasInt]!.addAll(filteredTunings);
+      }
+    }
+
+    return res;
   }
 
   static String customTuningName =  'Custom';

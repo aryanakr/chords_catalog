@@ -4,7 +4,9 @@ import 'package:chords_catalog/models/log.dart';
 import 'package:chords_catalog/models/log_scale.dart';
 import 'package:chords_catalog/models/midi_sequence.dart';
 import 'package:chords_catalog/models/progression.dart';
+import 'package:chords_catalog/providers/sound_player_provider.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:provider/provider.dart';
 
 import '../helpers/db_helper.dart';
 
@@ -63,14 +65,16 @@ class LogProvider extends ChangeNotifier {
     final dbInstance = DBHelper.instance;
 
     // save scale to database
+
+    if (scale.base.id == -1) {
+      int baseScaleId = await dbInstance.insertBaseScale(scale.base);
+      scale.base.id = baseScaleId;
+    }
+
     int scaleId;
 
-    if (scale.id == -1 ) {
-      scaleId = await dbInstance.insertScale(scale);
-      scale.id = scaleId;
-    } else {
-      scaleId = scale.id;
-    }
+    scaleId = await dbInstance.insertScale(scale);
+    scale.id = scaleId;
 
     // save tuning
     int tuningId;
@@ -90,6 +94,8 @@ class LogProvider extends ChangeNotifier {
     this.tuning = tuning;
     this.sound = sound;
     this.scale = scale;
+
+    // initialise sound player
   }
 
   Future<void> saveChord({required GuitarChord chord, int index = -1}) async {
@@ -101,6 +107,7 @@ class LogProvider extends ChangeNotifier {
       chord.id = chordId;
       chords.add(chord);
     } else {
+      chord.id = chords[index].id;
       dbInstance.updateChord(chord, id!);
       chords[index] = chord;
     }
@@ -115,11 +122,10 @@ class LogProvider extends ChangeNotifier {
       progression.id = progressionId;
       progressions.add(progression);
     } else {
-
       // delete current progression from database
-      await dbInstance.deleteProgressionRests(progression.id);
-      await dbInstance.deleteProgressionChords(progression.id);
-      await dbInstance.deleteProgression(progression.id);
+      await dbInstance.deleteProgressionRests(progressions[index].id);
+      await dbInstance.deleteProgressionChords(progressions[index].id);
+      await dbInstance.deleteProgression(progressions[index].id);
 
       // save new progression to database
       final progressionId = await _saveProgressionInDB(progression, dbInstance);

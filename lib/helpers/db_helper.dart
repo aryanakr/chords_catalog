@@ -53,13 +53,21 @@ class DBHelper{
         )''');
     // Scale table
     await db.execute('''  
+        CREATE TABLE base_scale (
+          id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+          name TEXT NOT NULL,
+          intervals TEXT NOT NULL,
+          is_custom BOOLEAN NOT NULL
+        )''');
+
+    await db.execute('''  
         CREATE TABLE scale (
           id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
           root TEXT NOT NULL,
-          name TEXT NOT NULL,
-          interval TEXT NOT NULL,
           notes TEXT NOT NULL,
-          is_custom BOOLEAN NOT NULL
+          base_scale_id INTEGER NOT NULL,
+          FOREIGN KEY (base_scale_id) REFERENCES base_scale(id)
+          ON DELETE NO ACTION ON UPDATE NO ACTION
         )''');
     // Tuning table
     await db.execute('''  
@@ -151,6 +159,41 @@ class DBHelper{
     });
   }
 
+  // Base Scale Dao
+  Future<int> insertBaseScale(BaseScale baseScale) async {
+    Database? db = await instance.database;
+
+    if (db != null) {
+      return await db.insert('base_scale', baseScale.toMap());
+    } else {
+      return -1;
+    }
+  }
+
+  Future<List<BaseScale>> queryAllBaseScales() async {
+    Database? db = await instance.database;
+    List<Map<String, dynamic>> maps = [];
+
+    if (db != null) {
+      maps = await db.query('base_scale');
+    }
+
+    return List.generate(maps.length, (i) {
+      return BaseScale.fromMap(maps[i]);
+    });
+  }
+
+  Future<BaseScale> getBaseScaleById(int id) async {
+    Database? db = await instance.database;
+    List<Map<String, dynamic>> maps = [];
+
+    if (db != null) {
+      maps = await db.query('base_scale', where: 'id = ?', whereArgs: [id]);
+    }
+
+    return BaseScale.fromMap(maps[0]);
+  }
+
   // Scale Dao
   Future<int> insertScale(LogScale scale) async {
     Database? db = await instance.database;
@@ -162,35 +205,22 @@ class DBHelper{
     }
   }
 
-  Future<void> updateScale(LogScale scale) async {
-    Database? db = await instance.database;
-
-    if (db != null && scale.id != -1) {
-      await db.update('scale', scale.toMap(),
-          where: 'id = ?', whereArgs: [scale.id]);
-    }
-  }
-
-  Future<List<LogScale>> queryAllScales() async {
-    Database? db = await instance.database;
-    List<Map<String, dynamic>> maps = [];
-
-    if (db != null) {
-      maps = await db.query('scale');
-    }
-
-    return List.generate(maps.length, (i) {
-      return LogScale.fromMap(maps[i]);
-    });
-  }
-
   Future<LogScale?> getScaleById(int id) async{
     Database? db = await instance.database;
 
     if (db != null) {
+      // get base scale
+      
+
       final maps = await db.query('scale', where: 'id = ?', whereArgs: [id]);
       if (maps.isNotEmpty) {
-        return LogScale.fromMap(maps[0]);
+        
+        // get base scale
+        final baseMaps = await db.query('base_scale', where: 'id = ?', whereArgs: [maps[0]['base_scale_id']]);
+
+        if (baseMaps.isNotEmpty) {
+          return LogScale.fromMap(maps[0], BaseScale.fromMap(baseMaps[0]));
+        }
       }
     }
 
@@ -209,15 +239,6 @@ class DBHelper{
     }
   }
 
-  Future<void> updateTuning(Tuning tuning) async {
-    Database? db = await instance.database;
-
-    if (db != null && tuning.id != -1) {
-      await db.update('tuning', tuning.toMap(),
-          where: 'id = ?', whereArgs: [tuning.id]);
-    }
-  }
-
   Future<List<Tuning>> queryAllTunings() async {
     Database? db = await instance.database;
     List<Map<String, dynamic>> maps = [];
@@ -226,9 +247,7 @@ class DBHelper{
       maps = await db.query('tuning');
     }
 
-    return List.generate(maps.length, (i) {
-      return Tuning.fromMap(maps[i]);
-    });
+    return maps.map((e) => Tuning.fromMap(e)).toList();
   }
 
   Future<Tuning?> getTuningById(int id) async {
@@ -341,7 +360,7 @@ class DBHelper{
     Database? db = await instance.database;
 
     if (db != null) {
-      await db.delete('progression_chord', where: 'progression_chord = ?', whereArgs: [progressionId]);
+      await db.delete('progression_chord', where: 'progression_id = ?', whereArgs: [progressionId]);
     }
   }
 

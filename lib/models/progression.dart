@@ -2,7 +2,7 @@ import 'package:chords_catalog/models/chord.dart';
 import 'package:chords_catalog/models/midi_sequence.dart';
 
 class Progression {
-  int id;
+  int id = -1;
   final MidiSequence sequence;
   final String name;
   final List<ProgressionContentElement> contentElements;
@@ -106,7 +106,7 @@ class ProgressionContentElement {
 
 class DBProgression {
 
-  final int id;
+  int id = -1;
   final String name;
   final int tempo;
   final int length;

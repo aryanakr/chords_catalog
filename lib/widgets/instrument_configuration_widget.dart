@@ -30,7 +30,7 @@ class _LogConfigurationWidgetState extends State<LogConfigurationWidget> {
 
   // Tuning
   int stringsNumber = 6;
-  Tuning tuning = Tuning.standardTuning();
+  late Tuning tuning;
 
   // Scale
   String scaleRoot = 'C';
@@ -45,6 +45,8 @@ class _LogConfigurationWidgetState extends State<LogConfigurationWidget> {
   void initState() {
     scaleBase = widget.loadedScales[0];
     scale = scaleBase.createLogScale(scaleRoot);
+
+    tuning = widget.loadedTunings[6]![0];
     super.initState();
   }
 

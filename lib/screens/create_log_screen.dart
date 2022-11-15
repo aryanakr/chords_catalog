@@ -22,44 +22,10 @@ class CreateLogScreen extends StatelessWidget {
       // print('Got log name: $logName');
       // print('Got tuning with name: ${tuning.name}, pitches: ${tuning.openNotes.map((e) => e.label)}');
       // print('Got Sound ${sound.name}');
-      print('Got scale ${scale.base.name} with notes ${scale.notes}');
+      print('Got scale ${scale.base.name} with notes ${scale.notes}, with id ${scale.id}');
       Provider.of<LogProvider>(context, listen: false)
           .setLog(logName, tuning, sound, scale);
       Navigator.of(context).pushNamedAndRemoveUntil(DashboardScreen.routeName, (route) => false);
-    }
-
-    Map<int, List<Tuning>> _parseTuningList(Map<String, dynamic> data) {
-      final Map<int, List<Tuning>> res = {};
-
-      for (final numStr in data.keys) {
-        final Map<String, dynamic> strTunning = data[numStr];
-        final numStrasInt = int.parse(numStr);
-        final List<Tuning> tunings = [];
-        for (final key in strTunning.keys) {
-          final openNotes = strTunning[key]
-              .toString()
-              .split(',')
-              .map((e) => MidiNote.byLabel(label: e))
-              .toList();
-          final tuning =
-              Tuning(name: key, openNotes: openNotes, numStrings: numStrasInt);
-          tunings.add(tuning);
-        }
-        res[numStrasInt] = tunings;
-      }
-
-      return res;
-    }
-
-    List<BaseScale> _parseScaleList(List<List<dynamic>> data) {
-      print(data[0]);
-      final List<BaseScale> res = [];
-
-      for (int i = 1; i < data.length; i++) {
-        final List<int> intervals = data[i][1].toString().split(',').map((e) => int.parse(e)).toList();
-        res.add(BaseScale(name: data[i][0], intervals: intervals, isCustomScale: false));
-      }
-      return res;
     }
 
     return Scaffold(
@@ -77,15 +43,15 @@ class CreateLogScreen extends StatelessWidget {
               child: FutureBuilder(
                   future: Future.wait([
                     Tuning.loadLib(),
-                    LogScale.loadLib()
+                    BaseScale.loadLib()
                   ]),
                   builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
                     if (!snapshot.hasData) {
                       return const Center(child: CircularProgressIndicator());
                     }
                   
-                    final tunings = _parseTuningList(snapshot.data![0]);
-                    final scales = _parseScaleList(snapshot.data![1]);
+                    final tunings = snapshot.data![0] as Map<int, List<Tuning>>;
+                    final scales = snapshot.data![1] as List<BaseScale>;
                   
                     return Container(
                       decoration: const BoxDecoration(

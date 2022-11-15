@@ -36,7 +36,7 @@ class Chord {
 
 class GuitarChord {
 
-  int id;
+  int id = -1;
   final Chord chord;
   final List<int?> cardDotsPos;
   final String name;
@@ -52,7 +52,7 @@ class GuitarChord {
       'type': chord.type,
       'structure': chord.structure,
       'note_labels': chord.noteLabels.join(','),
-      'card_dots_pos': cardDotsPos.join(','),
+      'dots_pos': cardDotsPos.join(','),
       'start_fret': startFret,
       'notes': midiNotes.map((e) => e?.midiNumber).join(','),
       'color': cardColor.value,
@@ -61,19 +61,20 @@ class GuitarChord {
   }
 
   static GuitarChord fromMap(Map<String, dynamic> map) {
+    print('dots pos: ${map['dots_pos']}');
     return GuitarChord(
       id: map['id'],
       chord: Chord(
         root: map['root'],
         type: map['type'],
         structure: map['structure'],
-        noteLabels: map['note_labels'].split(','),
+        noteLabels: map['note_labels'].toString().split(','),
       ),
-      cardDotsPos: map['card_dots_pos'].split(',').map((e) => int.parse(e)).toList(),
+      cardDotsPos: map['dots_pos'].toString().split(',').map((e) => e == 'null' ? null : int.parse(e)).toList(),
       name: map['name'],
       startFret: map['start_fret'],
-      midiNotes: map['notes'].split(',').map((e) => MidiNote.byMidiNumber(midiNumber: int.parse(e))).toList(),
-      cardColor: Color(map['color']),
+      midiNotes: map['notes'].toString().split(',').map((e) => e == 'null' ? null : MidiNote.byMidiNumber(midiNumber: int.parse(e))).toList(),
+      cardColor: Color(int.parse(map['color'])),
     );
   }
 

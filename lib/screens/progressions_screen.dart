@@ -24,7 +24,7 @@ class ProgressionsScreen extends StatelessWidget {
     }
 
     void _fabButtonPressed() {
-      Navigator.of(context).pushNamed(CreateProgressionScreen.routeName);
+      Navigator.of(context).pushNamed(CreateProgressionScreen.routeName, arguments: CreateProgressionArgs(progression: null));
     }
 
     return Scaffold(
