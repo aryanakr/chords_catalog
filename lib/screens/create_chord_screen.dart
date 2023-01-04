@@ -107,6 +107,7 @@ class _CreateChordScreenState extends State<CreateChordScreen> {
       } else {
         chordNotes[string] = note;
         chordCardNotes[string] = fret;
+        Provider.of<SoundPlayerProvider>(context, listen: false).playNote(note);
       }
     });
 

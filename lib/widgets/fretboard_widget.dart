@@ -1,5 +1,6 @@
 import 'package:chords_catalog/components/fretboard_fret.dart';
 import 'package:chords_catalog/providers/log_provider.dart';
+import 'package:chords_catalog/providers/sound_player_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -15,7 +16,7 @@ class FretboardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final openNotes = Provider.of<LogProvider>(context).tuning!.openNotes;
+    final openNotes = Provider.of<LogProvider>(context, listen: false).tuning!.openNotes;
     return Container(
       height: (openNotes.length) * 30.0 + 20,
       color: Colors.amber,

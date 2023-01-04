@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:chords_catalog/models/instrument.dart';
 import 'package:chords_catalog/models/midi_sequence.dart';
+import 'package:chords_catalog/models/note.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_midi/flutter_midi.dart';
@@ -48,7 +49,6 @@ class SoundPlayerProvider extends ChangeNotifier {
   void _playSequence(MidiSequence sequence) {
 
     //print current remaining weight
-    print(_playRemainingWeight);
     
 
     if (_playRemainingWeight == sequence.notes[_playSequenceIndex].weight.value && sequence.notes[_playSequenceIndex].notes.isNotEmpty) {
@@ -73,6 +73,10 @@ class SoundPlayerProvider extends ChangeNotifier {
     }
 
     notifyListeners();
+  }
+
+  void playNote(MidiNote note) {
+    _flutterMidi.playMidiNote(midi: note.midiNumber);
   }
 
   void pause() {

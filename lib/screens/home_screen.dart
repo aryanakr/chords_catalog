@@ -1,5 +1,7 @@
+import 'package:chords_catalog/models/instrument.dart';
 import 'package:chords_catalog/models/log.dart';
 import 'package:chords_catalog/providers/log_provider.dart';
+import 'package:chords_catalog/providers/sound_player_provider.dart';
 import 'package:chords_catalog/screens/create_log_screen.dart';
 import 'package:chords_catalog/screens/dashboard_screen.dart';
 import 'package:chords_catalog/theme/chord_log_colors.dart';
@@ -13,6 +15,7 @@ class HomeScreen extends StatelessWidget {
 
   void _loadLog(Log log, BuildContext context) {
     Provider.of<LogProvider>(context, listen: false).loadLog(log);
+
     Navigator.of(context).pushReplacementNamed(DashboardScreen.routeName);
   }
 
@@ -30,15 +33,15 @@ class HomeScreen extends StatelessWidget {
               const SizedBox(height: 16),
               Container(
                   margin: const EdgeInsets.symmetric(horizontal: 16),
-                  child: const Text("Guitar Chord Logs",
+                  child: const Text("Chords Log",
                       style: TextStyle(fontSize: 58, fontFamily: 'GreatVibes'),
                       textAlign: TextAlign.center)),
               const SizedBox(
-                height: 30,
+                height: 45,
               ),
               SizedBox(
-                width: screenSize.width / 4 * 3,
-                height: screenSize.height / 2 * 1,
+                width: screenSize.width / 5 * 4,
+                height: screenSize.height / 7 * 4,
                 child: Card(
                   elevation: 8,
                   child: Container(
@@ -54,61 +57,73 @@ class HomeScreen extends StatelessWidget {
                           },
                         ),
                         const SizedBox(height: 16),
-                        Container(
-                          color: Colors.grey,
-                          child: Column(
-                            children: [
-                              Container(
-                                height: 40,
-                                color: Colors.blue,
-                                child: Row(
-                                  children: [
-                                    Text('Log 1'),
-                                  ],
+                        Expanded(
+                          child: Container(
+                            color: ChordLogColors.secondary,
+                            child: Column(
+                              children: [
+                                // container with border
+                                Container(
+                                  height: 50,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    border: Border.all(
+                                      color: ChordLogColors.bodyColor,
+                                      width: 2,
+                                    
+                                    ),
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.center,
+                                    children: [
+                                      Text('Load Previous Logs'),
+                                    ],
+                                  ),
+                                
                                 ),
-                              
-                              ),
-                              MediaQuery.removePadding(
-                                removeTop: true,
-                                context: context,
-                                child: FutureBuilder(
-                                    future: Log.retrieveSavedLogs(),
-                                    builder: (context, snapshot) {
-                                      if (snapshot.hasData) {
-                                        final List<Log> logs =
-                                            snapshot.data as List<Log>;
-                                        return ListView.builder(
-                                          
-                                          itemCount: logs.length,
-                                          shrinkWrap: true,
-                                          itemBuilder: (context, index) {
-                                            return InkWell(
-                                              onTap: () => _loadLog(logs[index], context), // Navigate to dashboard
-                                              child: Container(
-                                                height: 55,
-                                                child: Card(
-                                                  color: Colors.red,
-                                                  child: Text(logs[index].name)
+                                MediaQuery.removePadding(
+                                  removeTop: true,
+                                  context: context,
+                                  child: FutureBuilder(
+                                      future: Log.retrieveSavedLogs(),
+                                      builder: (context, snapshot) {
+                                        if (snapshot.hasData) {
+                                          final List<Log> logs =
+                                              snapshot.data as List<Log>;
+                                          return ListView.builder(
+                                            
+                                            itemCount: logs.length,
+                                            shrinkWrap: true,
+                                            itemBuilder: (context, index) {
+                                              return InkWell(
+                                                onTap: () => _loadLog(logs[index], context), // Navigate to dashboard
+                                                child: Container(
+                                                  height: 50,
+                                                  child: Card(
+                                                    color: ChordLogColors.primary,
+                                                    child: Center(child: Text(logs[index].name, style: const TextStyle(color: Colors.white, fontSize: 16),)),
+                                                  ),
                                                 ),
-                                              ),
-                                            );
-                                          });
-                                      } else if (snapshot.hasError) {
-                                        return Center(
-                                          child: Text('Error: ${snapshot.error}'),
-                                        );
-                                      } else {
-                                        return const Center(
-                                          child: SizedBox(
-                                            width: 60,
-                                            height: 60,
-                                            child: CircularProgressIndicator(),
-                                          ),
-                                        );
-                                      }
-                                    }),
-                              ),
-                            ],
+                                              );
+                                            });
+                                        } else if (snapshot.hasError) {
+                                          return Center(
+                                            child: Text('Error: ${snapshot.error}'),
+                                          );
+                                        } else {
+                                          return const Center(
+                                            child: SizedBox(
+                                              width: 60,
+                                              height: 60,
+                                              child: CircularProgressIndicator(),
+                                            ),
+                                          );
+                                        }
+                                      }),
+                                ),
+                              ],
+                            ),
                           ),
                         )
                       ],

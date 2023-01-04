@@ -47,7 +47,7 @@ class _CreateProgressionScreenState extends State<CreateProgressionScreen> {
     log.saveProgression(progression: progression, index: progressionIndex);
 
     // remove navigator content and go back to progressions screen
-    Navigator.of(context).pushNamedAndRemoveUntil(ProgressionsScreen.routeName,(route) => route.isFirst);
+    Navigator.of(context).pushNamedAndRemoveUntil(ProgressionsScreen.routeName,(route) => false);
   }
 
   void addChord(GuitarChord? chord) {
@@ -94,7 +94,14 @@ class _CreateProgressionScreenState extends State<CreateProgressionScreen> {
     });
   }
 
-  void demoChord(GuitarChord chord) {}
+  void demoChord(GuitarChord chord) {
+    final weight = getSelectedWeight();
+    final mode = getSelectedPlayMode();
+
+    final sequence = MidiSequence(tempo: tempo, notes: chord.getSequenceNotesByMode(weight, mode));
+    final player = Provider.of<SoundPlayerProvider>(context, listen: false);
+    player.startSequence(sequence);
+  }
 
   void play() {
 
@@ -166,11 +173,16 @@ class _CreateProgressionScreenState extends State<CreateProgressionScreen> {
     });
   }
 
+  bool hasInit = false;
+
   @override
   Widget build(BuildContext context) {
 
-    final args = ModalRoute.of(context)!.settings.arguments as CreateProgressionArgs;
-    loadProgression(args);
+    if (!hasInit){
+      final args = ModalRoute.of(context)!.settings.arguments as CreateProgressionArgs;
+      loadProgression(args);
+      hasInit = true;
+    }
 
     final isPlaying = Provider.of<SoundPlayerProvider>(context).isPlaying;
 
