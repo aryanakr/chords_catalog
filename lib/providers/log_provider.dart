@@ -1,14 +1,11 @@
-import 'package:chords_catalog/models/chord.dart';
-import 'package:chords_catalog/models/instrument.dart';
-import 'package:chords_catalog/models/log.dart';
-import 'package:chords_catalog/models/log_scale.dart';
-import 'package:chords_catalog/models/midi_sequence.dart';
-import 'package:chords_catalog/models/progression.dart';
-import 'package:chords_catalog/providers/sound_player_provider.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter/foundation.dart';
 
 import '../helpers/db_helper.dart';
+import '../models/chord.dart';
+import '../models/instrument.dart';
+import '../models/log.dart';
+import '../models/log_scale.dart';
+import '../models/progression.dart';
 
 class LogProvider extends ChangeNotifier {
   String name;
@@ -95,7 +92,9 @@ class LogProvider extends ChangeNotifier {
     this.sound = sound;
     this.scale = scale;
 
-    // initialise sound player
+    // TODO: initialise sound player
+
+    notifyListeners();
   }
 
   Future<void> saveChord({required GuitarChord chord, int index = -1}) async {
@@ -111,6 +110,8 @@ class LogProvider extends ChangeNotifier {
       dbInstance.updateChord(chord, id!);
       chords[index] = chord;
     }
+
+    notifyListeners();
   }
 
   Future<void> saveProgression({required Progression progression, int index = -1}) async {
@@ -134,6 +135,8 @@ class LogProvider extends ChangeNotifier {
       progressions[index] = progression;
 
     }
+
+    notifyListeners();
 
   }
 

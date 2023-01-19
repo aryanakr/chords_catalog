@@ -1,4 +1,3 @@
-import 'package:chords_catalog/models/note.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_picker/flutter_picker.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
@@ -6,13 +5,14 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import '../components/painters/string_number_painter.dart';
 import '../models/instrument.dart';
 import '../theme/chord_log_colors.dart';
+import '../models/note.dart';
 
 class TuningConfigurationWidget extends StatefulWidget {
   final Tuning currentTuning;
   final List<Tuning> defaultTunings;
   final void Function(Tuning) update;
 
-  TuningConfigurationWidget(
+  const TuningConfigurationWidget(
       {Key? key,
       required this.currentTuning,
       required this.defaultTunings,
@@ -135,7 +135,7 @@ class _TuningConfigurationWidgetState extends State<TuningConfigurationWidget> {
             height: 8,
           ),
           Container(
-            margin: EdgeInsets.all(12),
+            margin: const EdgeInsets.all(12),
             child: StaggeredGrid.count(
               crossAxisCount: 3,
               crossAxisSpacing: 0,
@@ -146,19 +146,21 @@ class _TuningConfigurationWidgetState extends State<TuningConfigurationWidget> {
                   Row(
                     children: [
                       CustomPaint(
-                        size: Size(30, 30),
+                        size: const Size(30, 30),
                         painter:
                             StringNumberPainter(number: widget.currentTuning.numStrings - i),
                       ),
-                      TextButton(onPressed: (){_showPitchPicker(context, i);}, child: Row(children: [Text(widget.currentTuning.openNotes[i]?.label ?? '' , style: TextStyle(fontSize: 16),),
-                      Icon(Icons.arrow_drop_down)],),)
+                      TextButton(
+                        onPressed: () =>_showPitchPicker(context, i),
+                        child: Row(children: [Text(widget.currentTuning.openNotes[i]?.label ?? '' , style: const TextStyle(fontSize: 16),),
+                      const Icon(Icons.arrow_drop_down)],),)
                     ],
                   )
                   :
                   Row(
                     children: [
                       CustomPaint(
-                        size: Size(30, 30),
+                        size: const Size(30, 30),
                         painter:
                             StringNumberPainter(number: widget.currentTuning.numStrings - i),
                       ),

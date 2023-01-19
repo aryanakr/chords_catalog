@@ -1,7 +1,5 @@
-import 'package:chords_catalog/models/instrument.dart';
 import 'package:chords_catalog/models/log.dart';
 import 'package:chords_catalog/providers/log_provider.dart';
-import 'package:chords_catalog/providers/sound_player_provider.dart';
 import 'package:chords_catalog/screens/create_log_screen.dart';
 import 'package:chords_catalog/screens/dashboard_screen.dart';
 import 'package:chords_catalog/theme/chord_log_colors.dart';
@@ -37,7 +35,7 @@ class HomeScreen extends StatelessWidget {
                       style: TextStyle(fontSize: 58, fontFamily: 'GreatVibes'),
                       textAlign: TextAlign.center)),
               const SizedBox(
-                height: 45,
+                height: 40,
               ),
               SizedBox(
                 width: screenSize.width / 5 * 4,
@@ -62,7 +60,6 @@ class HomeScreen extends StatelessWidget {
                             color: ChordLogColors.secondary,
                             child: Column(
                               children: [
-                                // container with border
                                 Container(
                                   height: 50,
                                   decoration: BoxDecoration(
@@ -70,57 +67,53 @@ class HomeScreen extends StatelessWidget {
                                     border: Border.all(
                                       color: ChordLogColors.bodyColor,
                                       width: 2,
-                                    
                                     ),
                                   ),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.center,
-                                    children: [
-                                      Text('Load Previous Logs'),
-                                    ],
+                                  child: const Center(
+                                    child: Text('Load Previous Logs'),
                                   ),
-                                
                                 ),
                                 MediaQuery.removePadding(
                                   removeTop: true,
                                   context: context,
                                   child: FutureBuilder(
-                                      future: Log.retrieveSavedLogs(),
-                                      builder: (context, snapshot) {
-                                        if (snapshot.hasData) {
-                                          final List<Log> logs =
-                                              snapshot.data as List<Log>;
-                                          return ListView.builder(
-                                            
-                                            itemCount: logs.length,
-                                            shrinkWrap: true,
-                                            itemBuilder: (context, index) {
-                                              return InkWell(
-                                                onTap: () => _loadLog(logs[index], context), // Navigate to dashboard
-                                                child: Container(
-                                                  height: 50,
-                                                  child: Card(
-                                                    color: ChordLogColors.primary,
-                                                    child: Center(child: Text(logs[index].name, style: const TextStyle(color: Colors.white, fontSize: 16),)),
-                                                  ),
+                                    future: Log.retrieveSavedLogs(),
+                                    builder: (context, snapshot) {
+                                      if (snapshot.hasData) {
+                                        final List<Log> logs =
+                                            snapshot.data as List<Log>;
+                                        return ListView.builder(
+                                          
+                                          itemCount: logs.length,
+                                          shrinkWrap: true,
+                                          itemBuilder: (context, index) {
+                                            return InkWell(
+                                              onTap: () => _loadLog(logs[index], context), // Navigate to dashboard
+                                              child: SizedBox(
+                                                height: 50,
+                                                child: Card(
+                                                  color: ChordLogColors.primary,
+                                                  child: Center(
+                                                    child: Text(logs[index].name, style: const TextStyle(color: Colors.white, fontSize: 16),)),
                                                 ),
-                                              );
-                                            });
-                                        } else if (snapshot.hasError) {
-                                          return Center(
-                                            child: Text('Error: ${snapshot.error}'),
-                                          );
-                                        } else {
-                                          return const Center(
-                                            child: SizedBox(
-                                              width: 60,
-                                              height: 60,
-                                              child: CircularProgressIndicator(),
-                                            ),
-                                          );
-                                        }
-                                      }),
+                                              ),
+                                            );
+                                          });
+                                      } else if (snapshot.hasError) {
+                                        return Center(
+                                          child: Text('Error: ${snapshot.error}'),
+                                        );
+                                      } else {
+                                        return const Center(
+                                          child: SizedBox(
+                                            width: 60,
+                                            height: 60,
+                                            child: CircularProgressIndicator(),
+                                          ),
+                                        );
+                                      }
+                                    }
+                                  ),
                                 ),
                               ],
                             ),

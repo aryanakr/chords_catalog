@@ -1,20 +1,17 @@
-import 'package:chords_catalog/components/number_picker.dart';
-import 'package:chords_catalog/components/painters/chord_card_painter.dart';
-import 'package:chords_catalog/models/chord.dart';
-import 'package:chords_catalog/models/note.dart';
-import 'package:chords_catalog/providers/log_provider.dart';
-import 'package:chords_catalog/providers/sound_player_provider.dart';
-import 'package:chords_catalog/screens/chord_view_screen.dart';
-import 'package:chords_catalog/screens/dashboard_screen.dart';
-import 'package:chords_catalog/widgets/chord_card_widget.dart';
-import 'package:chords_catalog/widgets/create_chord_controls_widget.dart';
-import 'package:chords_catalog/widgets/fretboard_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:provider/provider.dart';
 import 'package:random_color/random_color.dart';
 
 import '../theme/chord_log_colors.dart';
+import '../models/chord.dart';
+import '../models/note.dart';
+import '../providers/log_provider.dart';
+import '../providers/sound_player_provider.dart';
+import '../screens/dashboard_screen.dart';
+import '../widgets/chord_card_widget.dart';
+import '../widgets/create_chord_controls_widget.dart';
+import '../widgets/fretboard_widget.dart';
 
 class CreateChordScreen extends StatefulWidget {
   static const routeName = '/create-chord';
@@ -32,7 +29,7 @@ class _CreateChordScreenState extends State<CreateChordScreen> {
   int startFret = 1;
 
   String selectedRootLabel = 'C';
-  Chord? selectedBaseChord = null;
+  Chord? selectedBaseChord;
   String selectedChordType = '';
 
   void _setRootNote(String newLabel) {
@@ -60,7 +57,6 @@ class _CreateChordScreenState extends State<CreateChordScreen> {
       startFret = fret;
 
       // remove out of card notes and set the start fret
-      final fretDiff = fret - startFret;
       for (int i = 0; i < chordCardNotes.length; i++) {
         final t = chordCardNotes[i];
         if (t != null && t != 0 && (t < fret || t - fret > 4)) {
@@ -162,7 +158,7 @@ class _CreateChordScreenState extends State<CreateChordScreen> {
       }
     }
 
-    Chord? suggestion = null;
+    Chord? suggestion;
 
     for (List<dynamic> row in lib) {
       final chord = Chord.createChordFromLibRow(row);
@@ -202,7 +198,7 @@ class _CreateChordScreenState extends State<CreateChordScreen> {
   }
 
   bool hasInit = false;
-  GuitarChord? initialChord = null;
+  GuitarChord? initialChord;
   int logIndex = -1;
 
   Color pickerColor = Colors.white;
@@ -222,7 +218,6 @@ class _CreateChordScreenState extends State<CreateChordScreen> {
             child: ColorPicker(
               pickerColor: pickerColor,
               onColorChanged: changeColor,
-              showLabel: true,
               pickerAreaHeightPercent: 0.8,
             ),
           ),
@@ -287,7 +282,7 @@ class _CreateChordScreenState extends State<CreateChordScreen> {
           child: Stack(children: [
             Container(
               height: MediaQuery.of(context).size.height,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(38),
@@ -297,7 +292,7 @@ class _CreateChordScreenState extends State<CreateChordScreen> {
               child: SingleChildScrollView(
                 child: Column(
                   children: [
-                    SizedBox(
+                    const SizedBox(
                       height: 16,
                     ),
                     Row(
@@ -305,16 +300,16 @@ class _CreateChordScreenState extends State<CreateChordScreen> {
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         Container(
-                          margin: EdgeInsets.only(bottom: 16),
+                          margin: const EdgeInsets.only(bottom: 16),
                           child: ElevatedButton(
                             onPressed: () {
                               showColorPicker();
                             },
-                            child: Icon(Icons.color_lens),
+                            child: const Icon(Icons.color_lens),
                             style: ButtonStyle(
-                              shape: MaterialStateProperty.all(CircleBorder()),
+                              shape: MaterialStateProperty.all(const CircleBorder()),
                               padding:
-                                  MaterialStateProperty.all(EdgeInsets.all(10)),
+                                  MaterialStateProperty.all(const EdgeInsets.all(10)),
                               backgroundColor: MaterialStateProperty.all(
                                   ChordLogColors.primary),
                             ),
@@ -331,14 +326,14 @@ class _CreateChordScreenState extends State<CreateChordScreen> {
                                   chordCardNotes, startFret)),
                         ),
                         Container(
-                          margin: EdgeInsets.only(bottom: 16),
+                          margin: const EdgeInsets.only(bottom: 16),
                           child: ElevatedButton(
                             onPressed: _playChord,
-                            child: Icon(Icons.volume_up),
+                            child: const Icon(Icons.volume_up),
                             style: ButtonStyle(
-                              shape: MaterialStateProperty.all(CircleBorder()),
+                              shape: MaterialStateProperty.all( const CircleBorder()),
                               padding:
-                                  MaterialStateProperty.all(EdgeInsets.all(10)),
+                                  MaterialStateProperty.all( const EdgeInsets.all(10)),
                               backgroundColor: MaterialStateProperty.all(
                                   ChordLogColors.primary),
                             ),
@@ -346,7 +341,7 @@ class _CreateChordScreenState extends State<CreateChordScreen> {
                         ),
                       ],
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 10,
                     ),
                     CreateChordControlsWidget(
@@ -361,12 +356,12 @@ class _CreateChordScreenState extends State<CreateChordScreen> {
                             : chordNotes.map((e) => e?.getNoteLabel()).toList(),
                         submitKey: _setRootNote,
                         submitChord: setChordTypeDef),
-                    SizedBox(
+                    const SizedBox(
                       height: 32,
                     ),
                     ElevatedButton(
                         onPressed: () => _submit(context),
-                        child: Text('Save Chord')),
+                        child: const Text('Save Chord')),
                     SizedBox(
                       height:
                           isFretboardVisibile ? 25.0 * (numStrings - 2) : 32,
@@ -386,24 +381,24 @@ class _CreateChordScreenState extends State<CreateChordScreen> {
                         color: ChordLogColors.bodyColor,
                         child: TextButton(
                           child: isFretboardVisibile
-                              ? Icon(
+                              ? const Icon(
                                   Icons.arrow_downward_rounded,
                                   color: Colors.white,
                                 )
-                              : Icon(
+                              : const Icon(
                                   Icons.arrow_upward_rounded,
                                   color: Colors.white,
                                 ),
                           style: TextButton.styleFrom(
                             padding: EdgeInsets.zero,
-                            minimumSize: Size(50, 30),
+                            minimumSize: const Size(50, 30),
                             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                           ),
                           onPressed: () => _setFretboardVisibility(
                               isFretboardVisibile ? false : true),
                         )),
                     AnimatedContainer(
-                      duration: Duration(milliseconds: 250),
+                      duration: const Duration(milliseconds: 250),
                       height: isFretboardVisibile
                           ? chordCardNotes.length * 30.0 + 20
                           : 0,

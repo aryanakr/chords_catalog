@@ -77,7 +77,7 @@ class _CreateProgressionScreenState extends State<CreateProgressionScreen> {
         adapter: NumberPickerAdapter(data: [
           NumberPickerColumn(begin: 20, end: 300, initValue: tempo),
         ]),
-        title: Text('Set Tempo'),
+        title: const Text('Set Tempo'),
         onConfirm: (Picker picker, List value) {
           setState(() {
             tempo = picker.getSelectedValues()[0];
@@ -89,7 +89,6 @@ class _CreateProgressionScreenState extends State<CreateProgressionScreen> {
 
   void deleteNote() {
     setState(() {
-      print(editIndex);
       progressionUIContent.removeAt(editIndex);
     });
   }
@@ -190,12 +189,12 @@ class _CreateProgressionScreenState extends State<CreateProgressionScreen> {
       body: NestedScrollView(
         headerSliverBuilder: (context, innerBoxIsScrolled) => [
           SliverAppBar(
-            title: Text('Create Progression'),
+            title: const Text('Create Progression'),
             backgroundColor: ChordLogColors.bodyColor,
             actions: [
               IconButton(
                 onPressed: submit,
-                icon: Icon(Icons.save),
+                icon: const Icon(Icons.save),
               ),
             ],
             //add text field below title
@@ -206,7 +205,7 @@ class _CreateProgressionScreenState extends State<CreateProgressionScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      Container(
+                      SizedBox(
                           width: MediaQuery.of(context).size.width / 2 - 24,
                           child: TextField(
                               controller: _nameController,
@@ -217,29 +216,28 @@ class _CreateProgressionScreenState extends State<CreateProgressionScreen> {
                                     color: Colors.white, fontSize: 16),
                                 labelText: 'Progression Name',
                               ))),
-                      Container(
-                          child: InkWell(
+                      InkWell(
                         onTap: () => showTempoPicker(context),
                         child: Container(
-                          child: Column(
-                            children: [
-                              Text(
-                                'Tempo',
-                                style: TextStyle(color: Colors.white),
-                              ),
-                              SizedBox(
-                                height: 4,
-                              ),
-                              Text('$tempo',
-                                  style: TextStyle(
-                                      color: Colors.white, fontSize: 18)),
-                            ],
+                      child: Column(
+                        children: [
+                          const Text(
+                            'Tempo',
+                            style: TextStyle(color: Colors.white),
                           ),
+                          const SizedBox(
+                            height: 4,
+                          ),
+                          Text('$tempo',
+                              style: const TextStyle(
+                                  color: Colors.white, fontSize: 18)),
+                        ],
+                      ),
                         ),
-                      )),
+                      ),
                     ],
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 8,
                   ),
                 ],
@@ -262,7 +260,7 @@ class _CreateProgressionScreenState extends State<CreateProgressionScreen> {
 
   Widget bodyContent(bool isPlaying) {
     return Container(
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(38),
@@ -288,7 +286,7 @@ class _CreateProgressionScreenState extends State<CreateProgressionScreen> {
                 )
               ],
             ),
-            SizedBox(height: 16,),
+            const SizedBox(height: 16,),
             controlPanel(isPlaying)
           ]),
     );
@@ -462,7 +460,7 @@ class _CreateProgressionScreenState extends State<CreateProgressionScreen> {
               onTap: () {
                 addChord(null);
               },
-              child: Container(
+              child: const SizedBox(
                 width: 115,
                 height: 175,
                 child: Center(

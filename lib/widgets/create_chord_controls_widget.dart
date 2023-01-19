@@ -1,9 +1,6 @@
 import 'package:chords_catalog/models/chord.dart';
 import 'package:chords_catalog/providers/log_provider.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:provider/provider.dart';
 
 import '../components/number_picker.dart';
@@ -18,6 +15,7 @@ class CreateChordControlsWidget extends StatefulWidget {
   final Function(String) submitKey;
   final Function(Chord?) submitChord;
   final Function makeSuggestion;
+
   const CreateChordControlsWidget(
       {Key? key,
       required this.startFret,
@@ -37,7 +35,6 @@ class CreateChordControlsWidget extends StatefulWidget {
 }
 
 class _CreateChordControlsWidgetState extends State<CreateChordControlsWidget> {
-
   @override
   Widget build(BuildContext context) {
     List<String> uniqueNotes = [];
@@ -49,16 +46,16 @@ class _CreateChordControlsWidgetState extends State<CreateChordControlsWidget> {
     }
 
     return Container(
-      margin: EdgeInsets.all(16),
+      margin: const EdgeInsets.all(16),
       child: Column(
         children: [
           Row(
             children: [
-              Text(
+              const Text(
                 'Root',
                 style: TextStyle(fontSize: 18),
               ),
-              SizedBox(
+              const SizedBox(
                 width: 32,
               ),
               SizedBox(
@@ -108,11 +105,11 @@ class _CreateChordControlsWidgetState extends State<CreateChordControlsWidget> {
 
                   return Row(
                     children: [
-                      Text(
+                      const Text(
                         'Type',
                         style: TextStyle(fontSize: 18),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         width: 32,
                       ),
                       SizedBox(
@@ -144,7 +141,9 @@ class _CreateChordControlsWidgetState extends State<CreateChordControlsWidget> {
                       SizedBox(
                         width: 36,
                       ),
-                      if (widget.chordType.isEmpty && uniqueNotes.length > 2 && !widget.hasSuggested)
+                      if (widget.chordType.isEmpty &&
+                          uniqueNotes.length > 2 &&
+                          !widget.hasSuggested)
                         TextButton(
                             onPressed: () {
                               widget.makeSuggestion();

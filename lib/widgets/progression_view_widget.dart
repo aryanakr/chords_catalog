@@ -10,8 +10,10 @@ class ProgressionViewWidget extends StatelessWidget {
   final int editIndex;
   final bool isPlaying;
 
-  const ProgressionViewWidget({Key? key, required this.content, required this.editIndex, required this.isPlaying}) : super(key: key);
+  ProgressionViewWidget({Key? key, required this.content, required this.editIndex, required this.isPlaying}) : super(key: key);
 
+  final ItemScrollController itemScrollController = ItemScrollController();
+  final ItemPositionsListener itemPositionsListener = ItemPositionsListener.create();
   @override
   Widget build(BuildContext context) {
 
@@ -60,12 +62,11 @@ class ProgressionViewWidget extends StatelessWidget {
       }
     }
 
-    final ItemScrollController itemScrollController = ItemScrollController();
-    final ItemPositionsListener itemPositionsListener = ItemPositionsListener.create();
+    
 
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) { 
       if (!isPlaying) {
-        itemScrollController.scrollTo(index: editIndex, duration: Duration(milliseconds: 500), curve: Curves.easeInOut);
+        itemScrollController.scrollTo(index: editIndex, duration: Duration(milliseconds: 500), curve: Curves.ease);
       }
     });
 
