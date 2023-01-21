@@ -1,4 +1,4 @@
-package com.example.chords_catalog
+package com.aryanakr.chords_catalog
 
 import io.flutter.embedding.android.FlutterActivity
 
